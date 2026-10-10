@@ -1,0 +1,26 @@
+# Local dependencies — Vercel runs `composer install --no-dev` during build.
+/vendor
+
+# Local state and secrets. Environment variables live in the Vercel dashboard.
+.env
+.env.*
+!.env.example
+/bootstrap/cache/*.php
+/storage
+/node_modules
+/public/build
+
+# Dumps and certificates are only used from a laptop.
+/backup
+/certs
+/database/*.sqlite
+
+# Development-only folders.
+/.git
+/.github
+/.idea
+/.vscode
+/legacy-node
+/tests
+/phpunit.xml
+/phpunit.xml.dist

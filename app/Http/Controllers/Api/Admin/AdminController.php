@@ -763,10 +763,16 @@ class AdminController extends Controller
 
     public function downloadFile(string $id)
     {
-        $file = ConsultationFile::query()->select('original_name', 'storage_path')->where('id', $id)->first();
+        $file = ConsultationFile::query()->select('original_name', 'storage_path', 'mime_type', 'contents')->where('id', $id)->first();
 
         if (! $file) {
             return response()->json(['message' => 'File tidak ditemukan.'], 404);
+        }
+
+        if ($file->contents !== null) {
+            return response()->streamDownload(function () use ($file): void {
+                echo $file->contents;
+            }, $file->original_name, ['Content-Type' => $file->mime_type]);
         }
 
         $path = Uploads::absolutize($file->storage_path);

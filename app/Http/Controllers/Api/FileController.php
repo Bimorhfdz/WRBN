@@ -8,7 +8,6 @@ use App\Support\Rows;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class FileController extends Controller
 {
@@ -59,15 +58,13 @@ class FileController extends Controller
             return response()->json(['message' => 'Ukuran file terlalu besar.'], 413);
         }
 
-        $filename = Str::uuid()->toString().'.'.$extension;
-        $stored = $file->storeAs('uploads', $filename, 'local');
-
         $row = ConsultationFile::query()->create([
             'consultation_id' => $id,
             'original_name' => $file->getClientOriginalName(),
-            'storage_path' => (string) $stored,
+            'storage_path' => null,
             'mime_type' => $clientMime,
             'size_bytes' => (int) $file->getSize(),
+            'contents' => file_get_contents($file->getRealPath()) ?: null,
         ]);
 
         return response()->json([
