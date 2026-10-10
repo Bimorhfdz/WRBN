@@ -1,0 +1,29 @@
+{
+  "name": "wrbn-statistical-consulting",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WRBN statistical consulting backend integrated with the existing frontend.",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "db:init": "node backend/utils/init-db.js",
+    "db:users": "node backend/utils/list-users.js",
+    "db:delete-user": "node backend/utils/delete-user.js",
+    "db:admin": "node backend/utils/create-admin.js",
+    "db:backup": "node backend/utils/backup-db.js",
+    "check": "node --check backend/server.js && node --check public/velaris.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.10.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2"
+  }
+}

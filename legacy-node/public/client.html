@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WRBN | Client Area</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b16;--bg2:#0b1120;--card:rgba(18,25,45,.72);--text:#f5f7ff;--muted:#9ba7c2;--line:rgba(255,255,255,.10);--a:#007DCC;--b:#D10056;--c:#FFB900;--good:#35d39a;--shadow:0 25px 80px rgba(0,0,0,.38)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text);background:var(--bg);min-height:100vh}#velarisBackground{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:1;mix-blend-mode:normal;background:#06130f}
+#velarisBackground::after{content:"";position:absolute;inset:-18%;pointer-events:none;z-index:2;background:radial-gradient(42% 34% at 12% 10%,rgba(125,255,178,.28),transparent 72%),radial-gradient(40% 34% at 88% 18%,rgba(22,199,132,.24),transparent 72%),radial-gradient(46% 38% at 54% 78%,rgba(11,143,98,.20),transparent 74%);filter:blur(48px);mix-blend-mode:screen;opacity:.72;animation:clientGreenDrift 14s ease-in-out infinite alternate}
+#velarisCanvas{position:absolute;inset:0;display:block;width:100%;height:100%;filter:blur(14px) saturate(1.18);opacity:.78;transform:scale(1.04)}
+@keyframes clientGreenDrift{0%{transform:translate3d(-2%,-1%,0) scale(1)}50%{transform:translate3d(2%,2%,0) scale(1.06)}100%{transform:translate3d(-1%,3%,0) scale(1.02)}}
+@media(prefers-reduced-motion:reduce){#velarisBackground::after{animation:none}}.nav,main{position:relative;z-index:2}a{color:inherit;text-decoration:none}.container{width:min(1160px,92%);margin:auto}.nav{position:sticky;top:0;z-index:20;background:rgba(7,11,22,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}.nav-inner{height:76px;display:flex;align-items:center;justify-content:space-between}.logo{font-weight:900;font-size:1.3rem;display:flex;align-items:center;gap:10px}.logo-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--a),var(--b));position:relative}.logo-mark:after{content:"";position:absolute;width:10px;height:10px;border:2px solid white;border-radius:50%;left:11px;top:11px}.nav-right{display:flex;gap:10px;align-items:center}.btn{border:1px solid var(--line);background:rgba(255,255,255,.05);color:white;padding:10px 15px;border-radius:12px;font-weight:750;cursor:pointer}.btn:hover{background:rgba(255,255,255,.09)}.btn.primary{border:0;background:linear-gradient(135deg,var(--a),#693F91 55%,var(--b))}.btn.danger{border-color:rgba(255,90,110,.3);color:#ffb7c0}.section{padding:45px 0}.head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}.kicker{color:#8f9cba;font-size:.75rem;text-transform:uppercase;letter-spacing:.16em;font-weight:850;margin-bottom:11px}.gradient{background:linear-gradient(100deg,#fff 15%,#82D7F4 42%,#F98CCE 82%,#fff);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}h1{font-size:clamp(2.4rem,5vw,4.5rem);line-height:.98;letter-spacing:-.06em;margin:0}h2{margin:0 0 7px;font-size:1.45rem}h3{margin:0 0 7px}.muted{color:var(--muted);line-height:1.65}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.card,.panel{border:1px solid var(--line);border-radius:21px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:var(--shadow)}.card{padding:22px}.panel{padding:24px;margin-bottom:18px}.stat{font-size:2rem;font-weight:900}.label{font-size:.72rem;color:#7e8aa5;text-transform:uppercase;letter-spacing:.08em}.message{color:#9ba7c2;font-size:.82rem;min-height:20px}.project-list{display:grid;gap:16px}.project{padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.025)}.project-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.code{font:600 .72rem 'IBM Plex Mono',monospace;color:#8e9ab6;letter-spacing:.08em}.project-title{font-size:1.2rem;font-weight:850;margin:5px 0}.meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid var(--line);font-size:.72rem;color:#c5cce0}.pill.package{background:rgba(0,125,204,.10)}.status{display:inline-flex;padding:7px 10px;border-radius:99px;background:rgba(0,125,204,.12);border:1px solid rgba(130,215,244,.18);font-size:.72rem;font-weight:800;white-space:nowrap}.status.completed{background:rgba(53,211,154,.10);border-color:rgba(53,211,154,.25)}.status.cancelled{background:rgba(255,90,110,.08);border-color:rgba(255,90,110,.22)}.tracking{display:flex;align-items:center;gap:13px;margin:20px 0 14px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.tracking-light{width:13px;height:13px;flex:0 0 13px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px rgba(255,185,0,.08),0 0 18px rgba(255,185,0,.8);animation:trackingPulse 1.8s ease-in-out infinite}.tracking-light.done{background:var(--good);box-shadow:0 0 0 4px rgba(53,211,154,.08),0 0 18px rgba(53,211,154,.75);animation:none}.tracking-light.cancelled{background:#ff5a6e;box-shadow:0 0 0 4px rgba(255,90,110,.08),0 0 18px rgba(255,90,110,.7);animation:none}.tracking-copy{min-width:0}.tracking-label{font-size:.76rem;color:#7e8aa5;text-transform:uppercase;letter-spacing:.1em;font-weight:850}.tracking-message{margin-top:3px;font-size:.88rem;font-weight:750;color:#eef3ff}.tracking-sub{margin-top:3px;font-size:.72rem;color:var(--muted);line-height:1.5}@keyframes trackingPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.62;transform:scale(.88)} }.details-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:17px}.info{border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.025)}.info .label{margin-bottom:5px}.info-value{font-size:.83rem;line-height:1.45}.project-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}.update-list{display:grid;gap:10px;margin-top:15px}.update{border-left:2px solid rgba(0,125,204,.65);padding:3px 0 3px 13px}.update-title{font-size:.84rem;font-weight:800}.update-message{font-size:.78rem;color:var(--muted);line-height:1.55;margin-top:3px}.update-date{font-size:.68rem;color:#6f7b95;margin-top:5px}.form{display:grid;gap:13px}.row{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field label{display:block;color:#9aa5bc;font-size:.75rem;margin:0 0 7px 2px}.field input,.field select,.field textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:#fff;padding:12px 13px;outline:none;font:inherit}.field textarea{min-height:100px;resize:vertical}.field select option{background:#101728}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:13px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:.82rem}.table th{color:#8995ad;font-size:.7rem;text-transform:uppercase}.empty{padding:20px;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}.file-list{display:grid;gap:8px;margin-top:12px}.file{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:.8rem}.dialog{width:min(540px,92vw);border:1px solid var(--line);border-radius:20px;background:#0b1120;color:#fff;padding:0;box-shadow:0 30px 100px rgba(0,0,0,.65)}.dialog::backdrop{background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}.dialog-inner{padding:24px}.dialog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.close{border:0;background:transparent;color:#9ba7c2;font-size:1.3rem;cursor:pointer}.small{font-size:.72rem;color:#7e8aa5}.link{color:#82d7f4;font-weight:750}.notice{padding:13px 15px;border-radius:13px;background:rgba(0,125,204,.08);border:1px solid rgba(130,215,244,.13);font-size:.78rem;color:#b9c9e7;margin-top:12px}.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:18px}.tab{border:1px solid var(--line);background:rgba(255,255,255,.035);color:#aab5ca;border-radius:999px;padding:8px 12px;cursor:pointer;font-size:.74rem}.tab.active{color:white;background:rgba(0,125,204,.12);border-color:rgba(130,215,244,.2)}
+@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.details-grid{grid-template-columns:1fr 1fr}.project-top{display:block}.project-top>.status{margin-top:12px}}@media(max-width:560px){.grid,.details-grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.head{display:block}.head>.btn{display:inline-block;margin-top:16px}.nav-inner{height:66px}.nav-right .muted{display:none}.project{padding:17px}.panel{padding:18px}}
+</style>
+<script src="/config.js"></script>
+</head>
+<body data-velaris-theme="green">
+<div id="velarisBackground" aria-hidden="true"><canvas id="velarisCanvas"></canvas></div>
+<nav class="nav"><div class="container nav-inner"><a href="/" class="logo"><span class="logo-mark"></span>WRBN</a><div class="nav-right"><span id="userName" class="muted"></span><button class="btn" id="logoutBtn">Logout</button></div></div></nav>
+<main class="container">
+<section class="section">
+  <div class="head"><div><div class="kicker">CLIENT AREA</div><h1>Workspace <span class="gradient">kamu.</span></h1><p class="muted">Pantau project, jadwal konsultasi, progres pengerjaan, dokumen, dan pembayaran dari satu tempat.</p></div><a class="btn primary" href="#new-project">+ Project Baru</a></div>
+  <div class="grid" id="stats"></div>
+</section>
+
+<section class="section" id="projectsSection">
+  <div class="head"><div><div class="kicker">PROJECT ANDA</div><h2>Semua project</h2><p class="muted">Setiap pengajuan punya project ID sendiri, jadi beberapa project dengan email yang sama tetap terpisah.</p></div></div>
+  <div id="projects" class="project-list"></div>
+</section>
+
+<section class="section" id="new-project">
+  <div class="panel"><div class="kicker">PROJECT BARU</div><h2>Ajukan project</h2><p class="muted">Pilih paket yang sudah dibayar. Paket yang dipilih akan otomatis melekat ke project ini.</p>
+    <form class="form" id="consultationForm">
+      <div class="row"><div class="field"><label>PAKET</label><select id="serviceId" required></select></div><div class="field"><label>JADWAL KONSULTASI AWAL (OPSIONAL)</label><input id="scheduledAt" type="datetime-local"></div></div>
+      <div class="field"><label>JUDUL PROJECT</label><input id="title" maxlength="160" required placeholder="Contoh: Analisis faktor yang memengaruhi penjualan"></div>
+      <div class="field"><label>KEBUTUHAN / DESKRIPSI</label><textarea id="description" maxlength="5000" required placeholder="Jelaskan tujuan, data yang tersedia, metode yang dibutuhkan, dan pertanyaan utama."></textarea></div>
+      <div class="field"><label>CATATAN TAMBAHAN</label><textarea id="notes" maxlength="3000" placeholder="Deadline, kebutuhan khusus, atau informasi tambahan."></textarea></div>
+      <button class="btn primary" type="submit">Kirim Project</button><p class="message" id="consultationMessage"></p>
+    </form>
+  </div>
+</section>
+
+<section class="section">
+  <div class="panel"><div class="kicker">PEMBAYARAN</div><h2>Riwayat pembayaran</h2><div id="payments"></div></div>
+</section>
+
+<section class="section">
+  <div class="panel"><div class="kicker">DATA / DOKUMEN</div><h2>Upload file project</h2><p class="muted">File tersimpan di project yang kamu pilih dan tidak dibuka sebagai file publik.</p>
+    <form class="form" id="uploadForm"><div class="field"><label>PROJECT</label><select id="uploadConsultation" required></select></div><div class="field"><label>FILE</label><input id="fileInput" type="file" required></div><button class="btn" type="submit">Upload File</button><p class="message" id="uploadMessage"></p></form>
+    <div id="files" class="file-list"></div>
+  </div>
+</section>
+</main>
+
+<dialog class="dialog" id="rescheduleDialog"><div class="dialog-inner"><div class="dialog-head"><div><div class="kicker">RESCHEDULE</div><h2>Ajukan jadwal baru</h2></div><button class="close" data-close="rescheduleDialog">×</button></div><form class="form" id="rescheduleForm"><input type="hidden" id="rescheduleProjectId"><div class="field"><label>JADWAL YANG DIMINTA</label><input id="requestedScheduledAt" type="datetime-local" required></div><div class="field"><label>ALASAN (OPSIONAL)</label><textarea id="rescheduleReason" maxlength="1000" placeholder="Contoh: ada bentrok jadwal kuliah."></textarea></div><button class="btn primary" type="submit">Kirim Pengajuan</button><p class="message" id="rescheduleMessage"></p></form></div></dialog>
+
+<dialog class="dialog" id="upgradeDialog"><div class="dialog-inner"><div class="dialog-head"><div><div class="kicker">UPGRADE</div><h2>Upgrade package</h2></div><button class="close" data-close="upgradeDialog">×</button></div><form class="form" id="upgradeForm"><input type="hidden" id="upgradeProjectId"><div class="field"><label>PAKET TUJUAN</label><select id="upgradeServiceId" required></select></div><div class="field"><label>CATATAN (OPSIONAL)</label><textarea id="upgradeReason" maxlength="1000" placeholder="Jelaskan kebutuhan tambahan yang ingin kamu dapatkan."></textarea></div><div class="notice">Pengajuan upgrade belum otomatis mengubah paket atau harga. Tim WRBN akan mengecek kebutuhan dan menghubungi kamu untuk konfirmasi.</div><button class="btn primary" type="submit">Ajukan Upgrade</button><p class="message" id="upgradeMessage"></p></form></div></dialog>
+
+<script>
+const API=(window.WRBN_CONFIG?.API_BASE_URL||'')+'/api';
+let allConsultations=[];
+let allServices=[];
+async function api(path,opt={}){const r=await fetch(API+path,{...opt,credentials:'include',headers:{...(opt.headers||{})}});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.message||'Request gagal');return d}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function rupiah(n){return Number(n||0).toLocaleString('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0})}
+function dateTime(v){return v?new Date(v).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):'-'}
+function statusLabel(s){return ({submitted:'Sedang diproses',reviewing:'Sedang diproses',in_progress:'Sedang diproses',completed:'Selesai',cancelled:'Dibatalkan'})[s]||'Sedang diproses'}
+function trackHtml(status,latestUpdate){
+ const cancelled=status==='cancelled', done=status==='completed';
+ const label=done?'SELESAI':cancelled?'DIBATALKAN':'SEDANG BERJALAN';
+ const fallback=done?'Project sudah selesai.':cancelled?'Project dibatalkan oleh client.':'Project sedang diproses oleh tim WRBN.';
+ const message=latestUpdate?.title || fallback;
+ const sub=latestUpdate?.message || (done?'Tidak ada proses lanjutan.':'Status ini akan diperbarui oleh konsultan melalui sistem admin.');
+ return `<div class="tracking"><span class="tracking-light ${done?'done':''} ${cancelled?'cancelled':''}"></span><div class="tracking-copy"><div class="tracking-label">${label}</div><div class="tracking-message">${esc(message)}</div><div class="tracking-sub">${esc(sub)}</div></div></div>`;
+}
+function projectActions(c){return `<div class="project-actions"><button class="btn" data-detail="${c.id}">Detail & Tracking</button>${!['completed','cancelled'].includes(c.status)?`<button class="btn" data-reschedule="${c.id}">Reschedule</button><button class="btn" data-upgrade="${c.id}">Upgrade Package</button>`:''}${c.status!=='cancelled'&&c.status!=='completed'?`<button class="btn danger" data-cancel="${c.id}">Batalkan</button>`:''}</div>`}
+function projectCard(c,detail){
+ const meeting=c.meeting_url?`<a class="link" href="${esc(c.meeting_url)}" target="_blank" rel="noopener">Buka Google Meet / Zoom</a>`:'Belum dijadwalkan';
+ const updates=detail?.updates||[];
+ const latestUpdate=updates[0] || (c.latest_update_title ? {title:c.latest_update_title,message:c.latest_update_message} : null);
+ const res=detail?.reschedules?.[0]; const up=detail?.upgrades?.[0];
+ return `<article class="project">
+   <div class="project-top"><div><div class="code">${esc(c.project_code||'PROJECT')}</div><div class="project-title">${esc(c.title)}</div><div class="meta"><span class="pill package">Paket: ${esc(c.service_name)}</span><span class="pill">Dibuat: ${esc(dateTime(c.created_at))}</span></div></div></div>
+   ${trackHtml(c.status,latestUpdate)}
+   <div class="details-grid">
+     <div class="info"><div class="label">Jadwal Konsultasi</div><div class="info-value">${esc(dateTime(c.scheduled_at))}</div></div>
+     <div class="info"><div class="label">Link Meeting</div><div class="info-value">${meeting}</div></div>
+     <div class="info"><div class="label">Nama Konsultan</div><div class="info-value">${esc(c.consultant_name||'Belum ditentukan')}</div></div>
+     <div class="info"><div class="label">Contact Person</div><div class="info-value">${esc(c.contact_person||'Belum ditentukan')}</div></div>
+     <div class="info"><div class="label">Proses Terakhir</div><div class="info-value">${esc(latestUpdate?.title||statusLabel(c.status))}</div></div>
+     <div class="info"><div class="label">Package</div><div class="info-value">${esc(c.service_name)}${c.price_label?` · ${esc(c.price_label)}`:''}</div></div>
+   </div>
+   ${res&&res.status==='pending'?`<div class="notice">Reschedule diajukan untuk <b>${esc(dateTime(res.requested_scheduled_at))}</b> · menunggu konfirmasi.</div>`:''}
+   ${up&&up.status==='pending'?`<div class="notice">Upgrade ke <b>${esc(up.requested_service_name)}</b> sedang diproses.</div>`:''}
+   ${detail?`<div class="update-list">${updates.length?updates.map(u=>`<div class="update"><div class="update-title">${esc(u.title)}</div><div class="update-message">${esc(u.message)}</div><div class="update-date">${esc(dateTime(u.created_at))}</div></div>`).join(''):'<div class="empty">Belum ada update dari konsultan.</div>'}</div>`:''}
+   ${projectActions(c)}
+ </article>`;
+}
+async function renderProjects(){
+ const root=document.getElementById('projects');
+ if(!allConsultations.length){root.innerHTML='<div class="empty">Belum ada project. Setelah payment selesai, kamu bisa membuat project pertama di bawah.</div>';return;}
+ root.innerHTML=allConsultations.map(c=>projectCard(c)).join('');
+ bindProjectButtons();
+}
+async function bindProjectButtons(){
+ document.querySelectorAll('[data-detail]').forEach(btn=>btn.onclick=async()=>{try{const d=await api('/consultations/'+btn.dataset.detail);const c=d.consultation;btn.closest('.project').outerHTML=projectCard(c,d);bindProjectButtons()}catch(e){alert(e.message)}});
+ document.querySelectorAll('[data-reschedule]').forEach(btn=>btn.onclick=()=>{document.getElementById('rescheduleProjectId').value=btn.dataset.reschedule;document.getElementById('rescheduleMessage').textContent='';document.getElementById('rescheduleDialog').showModal()});
+ document.querySelectorAll('[data-upgrade]').forEach(btn=>btn.onclick=()=>openUpgrade(btn.dataset.upgrade));
+ document.querySelectorAll('[data-cancel]').forEach(btn=>btn.onclick=async()=>{if(!confirm('Batalkan project ini?'))return;try{await api('/consultations/'+btn.dataset.cancel,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'cancelled'})});await load()}catch(e){alert(e.message)}});
+}
+async function openUpgrade(projectId){
+ document.getElementById('upgradeProjectId').value=projectId;document.getElementById('upgradeMessage').textContent='';
+ const current=allConsultations.find(c=>c.id===projectId);const opts=allServices.filter(s=>s.id!==current?.service_id);
+ document.getElementById('upgradeServiceId').innerHTML=opts.length?opts.map(s=>`<option value="${s.id}">${esc(s.name)} — ${esc(s.priceLabel)}</option>`).join(''):'<option value="">Tidak ada paket lain</option>';
+ document.getElementById('upgradeDialog').showModal();
+}
+async function load(){
+ const me=await api('/auth/me').catch(()=>null);if(!me){location.href='/';return}document.getElementById('userName').textContent=me.user.name;
+ const dash=await api('/client/dashboard');
+ allServices=(await api('/services')).services;
+ const payments=(await api('/payments')).payments;
+ allConsultations=(await api('/consultations')).consultations;
+ document.getElementById('stats').innerHTML=`<div class="card"><div class="label">PROJECT</div><div class="stat">${allConsultations.length}</div><div class="small">Project terpisah berdasarkan ID</div></div><div class="card"><div class="label">SEDANG BERJALAN</div><div class="stat">${allConsultations.filter(c=>['submitted','reviewing','in_progress'].includes(c.status)).length}</div><div class="small">Sedang diproses</div></div><div class="card"><div class="label">SELESAI</div><div class="stat">${allConsultations.filter(c=>c.status==='completed').length}</div><div class="small">Project selesai</div></div>`;
+ const paidServiceIds=[...new Set(payments.filter(p=>p.status==='paid').map(p=>p.service_id))];
+ const paidServices=allServices.filter(s=>paidServiceIds.includes(s.id));
+ document.getElementById('serviceId').innerHTML=paidServices.length?paidServices.map(s=>`<option value="${s.id}">${esc(s.name)} — ${esc(s.priceLabel)}</option>`).join(''):'<option value="">Belum ada paket paid</option>';
+ if(paidServices.length===1)document.getElementById('serviceId').value=paidServices[0].id;
+ document.getElementById('uploadConsultation').innerHTML=allConsultations.length?allConsultations.map(c=>`<option value="${c.id}">${esc(c.project_code)} · ${esc(c.title)}</option>`).join(''):'<option value="">Belum ada project</option>';
+ await renderProjects();
+ document.getElementById('payments').innerHTML=payments.length?`<div class="table-wrap"><table class="table"><thead><tr><th>Paket</th><th>Nominal</th><th>Status</th><th>Jadwal</th><th>Dibuat</th></tr></thead><tbody>${payments.map(p=>`<tr><td>${esc(p.service_name)}</td><td>${p.amount?rupiah(p.amount):'Custom'}</td><td><span class="status">${esc(p.status)}</span></td><td>${esc(dateTime(p.scheduled_at))}</td><td>${esc(dateTime(p.created_at))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Belum ada pembayaran.</div>';
+}
+
+document.getElementById('consultationForm').onsubmit=async e=>{e.preventDefault();const m=document.getElementById('consultationMessage');m.textContent='Mengirim...';try{await api('/consultations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({serviceId:document.getElementById('serviceId').value,title:document.getElementById('title').value,description:document.getElementById('description').value,scheduledAt:document.getElementById('scheduledAt').value,notes:document.getElementById('notes').value})});m.textContent='Project berhasil dibuat.';e.target.reset();await load();document.getElementById('projectsSection').scrollIntoView({behavior:'smooth'})}catch(err){m.textContent=err.message}};
+
+document.getElementById('rescheduleForm').onsubmit=async e=>{e.preventDefault();const m=document.getElementById('rescheduleMessage');try{await api('/consultations/'+document.getElementById('rescheduleProjectId').value+'/reschedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestedScheduledAt:document.getElementById('requestedScheduledAt').value,reason:document.getElementById('rescheduleReason').value})});m.textContent='Pengajuan reschedule terkirim.';setTimeout(()=>{document.getElementById('rescheduleDialog').close();load()},700)}catch(err){m.textContent=err.message}};
+
+document.getElementById('upgradeForm').onsubmit=async e=>{e.preventDefault();const m=document.getElementById('upgradeMessage');try{await api('/consultations/'+document.getElementById('upgradeProjectId').value+'/upgrade',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestedServiceId:document.getElementById('upgradeServiceId').value,reason:document.getElementById('upgradeReason').value})});m.textContent='Pengajuan upgrade terkirim.';setTimeout(()=>{document.getElementById('upgradeDialog').close();load()},700)}catch(err){m.textContent=err.message}};
+
+document.getElementById('uploadForm').onsubmit=async e=>{e.preventDefault();const m=document.getElementById('uploadMessage'),idValue=document.getElementById('uploadConsultation').value,file=document.getElementById('fileInput').files[0];if(!idValue||!file){m.textContent='Pilih project dan file terlebih dahulu.';return}const fd=new FormData();fd.append('file',file);try{const r=await fetch(API+'/consultations/'+idValue+'/files',{method:'POST',body:fd,credentials:'include'});const d=await r.json();if(!r.ok)throw new Error(d.message);m.textContent='File berhasil diupload.';e.target.reset();const f=await api('/consultations/'+idValue+'/files');document.getElementById('files').innerHTML=f.files.map(x=>`<div class="file"><span>${esc(x.original_name)}</span><span>${(x.size_bytes/1024/1024).toFixed(2)} MB</span></div>`).join('')}catch(err){m.textContent=err.message}};
+
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.close).close());
+document.getElementById('logoutBtn').onclick=async()=>{await api('/auth/logout',{method:'POST'});location.href='/'};
+load().catch(e=>{console.error(e);location.href='/'});
+</script>
+</body></html>

@@ -1,0 +1,15 @@
+const router=require('express').Router();
+const c=require('../controllers/consultation-controller');
+const f=require('../controllers/file-controller');
+const {requireAuth}=require('../middleware/auth');
+const {upload}=require('../middleware/upload');
+router.use(requireAuth);
+router.post('/',c.create);
+router.get('/',c.list);
+router.get('/:id',c.getOne);
+router.patch('/:id',c.update);
+router.post('/:id/reschedule',c.requestReschedule);
+router.post('/:id/upgrade',c.requestUpgrade);
+router.post('/:id/files',upload.single('file'),f.upload);
+router.get('/:id/files',f.list);
+module.exports=router;

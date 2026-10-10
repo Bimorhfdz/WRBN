@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="WRBN: Konsultasi statistika untuk keputusan yang lebih tajam, berbasis data.">
+<title>WRBN | Statistical Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070b16;
+  --bg2:#0b1120;
+  --card:rgba(18,25,45,.72);
+  --card2:rgba(255,255,255,.055);
+  --text:#f5f7ff;
+  --muted:#9ba7c2;
+  --line:rgba(255,255,255,.10);
+  --a:#007DCC;
+  --b:#D10056;
+  --c:#FFB900;
+  --danger:#B2054C;
+  --shadow:0 25px 80px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--text); background:var(--bg);
+  min-height:100vh; overflow-x:hidden; position:relative;
+  background-image:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size:60px 60px;
+  background-attachment:fixed;
+  background-position:-1px -1px;
+  animation:gridDrift 10s linear infinite;
+}
+@keyframes gridDrift{
+  0%{background-position:-1px -1px}
+  100%{background-position:59px 59px}
+}
+body::after{
+  content:"";position:fixed;inset:-15%;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(45% 38% at 12% 4%,rgba(0,125,204,.22),transparent 70%),
+    radial-gradient(45% 38% at 90% 12%,rgba(209,0,86,.16),transparent 70%),
+    radial-gradient(120% 85% at 50% 0%, transparent 0%, transparent 26%, var(--bg2) 82%);
+  animation:featherBreathe 6s ease-in-out infinite;
+}
+@keyframes featherBreathe{
+  0%,100%{opacity:.6; transform:scale(1) translate(0,0)}
+  50%{opacity:1; transform:scale(1.08) translate(-1.5%,1%)}
+}
+
+#velarisBackground{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.58;mix-blend-mode:screen}
+#velarisCanvas{display:block;width:100%;height:100%;filter:blur(10px) saturate(1.08)}
+.nav,main,.footer,.modal{position:relative;z-index:2}
+
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.container{width:min(1160px,92%);margin:auto}
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  background:rgba(7,11,22,.62);backdrop-filter:blur(18px);
+  border-bottom:1px solid transparent;transition:.3s;
+}
+.nav.scrolled{border-color:var(--line);background:rgba(7,11,22,.86)}
+.nav-inner{height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{font-weight:900;letter-spacing:-.04em;font-size:1.3rem;display:flex;align-items:center;gap:10px}
+.logo-mark{
+  width:34px;height:34px;border-radius:11px;
+  background:linear-gradient(135deg,var(--a),var(--b));
+  box-shadow:0 0 30px rgba(0,125,204,.35);
+  position:relative;
+}
+.logo-mark:after{content:"";position:absolute;width:10px;height:10px;border:2px solid white;border-radius:50%;left:11px;top:11px}
+.nav-links{display:flex;gap:28px;color:#bdc6dc;font-size:.88rem;font-weight:450}
+.nav-links a{transition:.2s}.nav-links a:hover{color:#fff}
+.nav-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
+#navUserName{display:inline-flex;align-items:center;max-width:170px;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);font-size:.78rem;font-weight:700;color:#dce4f6}
+#clientAreaBtn,#navLogoutBtn{padding:10px 14px;white-space:nowrap}
+#clientAreaBtn{border-color:rgba(130,215,244,.22);background:rgba(0,125,204,.10)}
+#navLogoutBtn{color:#c7cede;background:rgba(255,255,255,.035)}
+.btn{
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:white;
+  padding:11px 17px;border-radius:12px;font-weight:650;transition:.25s;
+  position:relative;isolation:isolate;
+}
+.btn::before{
+  content:"";position:absolute;inset:-8px;z-index:-1;border-radius:inherit;
+  background:radial-gradient(circle,var(--a),var(--b) 60%,transparent 75%);
+  opacity:.3;filter:blur(16px);pointer-events:none;
+  animation:btn-glow 3s ease-in-out infinite;
+}
+@keyframes btn-glow{0%,100%{opacity:.22;transform:scale(.9)}50%{opacity:.5;transform:scale(1.1)}}
+.btn:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.09)}
+.btn.primary{border:0;background:linear-gradient(135deg,var(--a),#693F91 55%,var(--b));box-shadow:0 12px 35px rgba(178,5,76,.22)}
+.btn.primary:hover{box-shadow:0 18px 45px rgba(178,5,76,.32)}
+.mobile{display:none}
+
+.hero{padding:150px 0 85px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid var(--line);
+  border-radius:99px;color:#cbd4eb;background:rgba(255,255,255,.04);font-size:.82rem;margin-bottom:22px
+}
+.dot{width:7px;height:7px;background:var(--c);border-radius:50%;box-shadow:0 0 14px var(--c)}
+h1{font-size:clamp(3rem,6.3vw,5.7rem);line-height:.94;letter-spacing:-.065em;max-width:800px}
+.gradient{
+  background:linear-gradient(100deg,#fff 15%,#82D7F4 42%,#F98CCE 82%,#fff 100%);
+  background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:gradient-flow 6s ease-in-out infinite;
+}
+@keyframes gradient-flow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.hero p{font-size:1.05rem;line-height:1.8;color:var(--muted);font-weight:400;max-width:650px;margin:25px 0}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.micro{display:flex;gap:18px;flex-wrap:wrap;color:#8591ad;font-size:.82rem;margin-top:22px}
+.micro span{display:flex;gap:7px;align-items:center}.micro b{color:#dfe6f6}
+.figure{
+  min-height:480px;border:1px solid var(--line);border-radius:16px;
+  background:rgba(9,13,25,.55);box-shadow:var(--shadow);
+  position:relative;overflow:hidden;padding:26px 26px 22px;display:flex;flex-direction:column;
+}
+.figure-cap{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px;font-family:'IBM Plex Mono',ui-monospace,monospace}
+.figure-cap .t{font-size:.95rem;color:var(--text);font-weight:600}
+.figure-cap .n{font-size:.78rem;color:#7e8aa5}
+.figure svg{width:100%;flex:1;display:block}
+.figure-axis text{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;fill:#7e8aa5}
+.figure-caption{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:.85rem;color:#aeb8cd;line-height:1.75;font-family:'IBM Plex Mono',ui-monospace,monospace}
+.figure-caption b{color:var(--text);font-weight:700}
+
+.section{padding:100px 0}
+.section-head{max-width:730px;margin-bottom:42px}
+.kicker{color:#8f9cba;font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;font-weight:650;margin-bottom:13px}
+h2{font-size:clamp(2rem,4vw,3.5rem);letter-spacing:-.05em;line-height:1.02;font-weight:760}
+.section-head p{color:var(--muted);line-height:1.75;margin-top:16px;font-weight:400}
+.chip-tabs{position:relative;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.chip{
+  position:relative;z-index:1;background:transparent;border:0;color:var(--muted);
+  font-size:.85rem;font-weight:600;padding:9px 16px;border-radius:10px;transition:color .25s;
+}
+.chip:hover{color:#fff}
+.chip.active{color:#fff}
+.chip-pill{
+  position:absolute;top:0;left:0;height:100%;z-index:0;border-radius:10px;
+  background:linear-gradient(90deg,var(--a),var(--b));
+  transition:left .35s cubic-bezier(.22,1,.36,1),width .35s cubic-bezier(.22,1,.36,1);
+}
+.card.hide{display:none}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.card{
+  border:1px solid var(--line);border-radius:21px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+  padding:25px;transition:.35s;position:relative;overflow:hidden;
+}
+.card:after{content:"";position:absolute;width:130px;height:130px;border-radius:50%;right:-80px;top:-80px;background:rgba(0,125,204,.08);filter:blur(12px);animation:glow-pulse 4s ease-in-out infinite}
+.card:hover{transform:translateY(-7px);border-color:rgba(255,185,0,.22);box-shadow:0 20px 55px rgba(0,0,0,.24)}
+.icon{
+  width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:20px;
+  background:linear-gradient(135deg,rgba(0,125,204,.18),rgba(209,0,86,.12));border:1px solid var(--line);font-size:1.15rem
+}
+.card h3{font-size:1.08rem;margin-bottom:9px;font-weight:700}.card p{color:var(--muted);line-height:1.65;font-size:.9rem;font-weight:400}
+.card ul{margin-top:15px;list-style:none;display:grid;gap:8px;color:#c4cce0;font-size:.82rem}
+.card li:before{content:"✓";color:var(--c);margin-right:8px}
+
+.process{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.step{padding:22px;border-top:1px solid var(--line);position:relative}
+.num{font-size:.75rem;color:#7e8aa5;margin-bottom:32px}.step h3{margin-bottom:8px}.step p{font-size:.84rem;color:var(--muted);line-height:1.6}
+
+
+.split{display:grid;grid-template-columns:.9fr 1.1fr;gap:50px;align-items:center}
+.panel{
+  border:1px solid var(--line);border-radius:25px;padding:28px;background:rgba(255,255,255,.035);
+}
+.bars{display:grid;gap:14px}.barrow{display:grid;grid-template-columns:120px 1fr 45px;gap:10px;align-items:center;font-size:.78rem;color:#aeb7ca}
+.track{height:8px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}.fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b));width:0;transition:1.2s ease}
+.vm-vision{color:#e6ebf7;line-height:1.7;font-size:1rem}
+.vm-list{list-style:none;counter-reset:vm;display:grid;gap:12px;color:#aeb7ca;font-size:.86rem;line-height:1.6}
+.vm-list li{counter-increment:vm;position:relative;padding-left:34px}
+.vm-list li:before{content:counter(vm);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;color:#fff;background:rgba(0,125,204,.35)}
+.vm-list b{color:#e6ebf7}
+.quote{margin-top:16px;padding:18px;border-left:2px solid var(--b);background:rgba(209,0,86,.035);color:#cfd6e8;line-height:1.7;font-size:.9rem}
+
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.price{padding:28px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.035)}
+.price.featured{border-color:rgba(0,125,204,.48);background:linear-gradient(145deg,rgba(0,125,204,.12),rgba(255,255,255,.035))}
+.price-tag{display:inline-block;padding:6px 9px;border-radius:8px;background:rgba(0,125,204,.13);font-size:.7rem;color:#9fd8ff;font-weight:800;margin-bottom:15px}
+.price h3{font-size:1.1rem;font-weight:700}.price .amount{font-size:2rem;font-weight:780;letter-spacing:-.04em;margin:13px 0 18px}.price .amount span{font-size:.75rem;color:#7f8aa4;font-weight:500}
+.price ul{list-style:none;display:grid;gap:10px;color:#aab4ca;font-size:.84rem;margin-bottom:22px}.price li:before{content:"✓";color:var(--c);margin-right:8px}
+
+.cta{
+  border:1px solid var(--line);border-radius:30px;padding:60px;position:relative;overflow:hidden;
+  background:radial-gradient(circle at 10% 90%,rgba(0,125,204,.16),transparent 35%),rgba(255,255,255,.035);
+}
+.cta::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(circle at 90% 10%,rgba(209,0,86,.28),transparent 32%);
+  animation:cta-glow 4s ease-in-out infinite;
+}
+.cta>*{position:relative;z-index:1}
+@keyframes cta-glow{0%,100%{opacity:.5}50%{opacity:1}}
+.cta h2{max-width:700px}.cta p{color:var(--muted);margin:18px 0 25px;max-width:620px;line-height:1.7}
+
+.contact{display:grid;grid-template-columns:.8fr 1.2fr;gap:25px}
+.contact-info{display:grid;gap:12px}.contact-item{padding:18px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.03)}
+.contact-item small{display:block;color:#7e8aa5;margin-bottom:6px;font-size:.72rem;font-weight:550;letter-spacing:.04em}.contact-item strong{font-size:.9rem;font-weight:650}
+.form{display:grid;gap:13px}.row{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field label{display:block;color:#9aa5bc;font-size:.72rem;font-weight:600;letter-spacing:.04em;margin:0 0 7px 2px}.field input,.field select,.field textarea{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:#fff;padding:12px 13px;outline:none;transition:.2s
+}
+.field textarea{min-height:120px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(209,0,86,.5);box-shadow:0 0 0 4px rgba(209,0,86,.06)}
+.field select option{background:#101728}
+.form-note{font-size:.72rem;color:#6f7b94;line-height:1.5}
+
+.cal-field{position:relative}
+.dt-row{display:flex;gap:8px}
+.dt-trigger{
+  flex:1;text-align:left;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+  color:#fff;padding:12px 13px;font:inherit;cursor:pointer;
+}
+.dt-trigger:hover{border-color:rgba(255,255,255,.22)}
+.dt-time{
+  width:120px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+  color:#fff;padding:12px 10px;font:inherit;outline:none;
+}
+.cal-pop{
+  display:none;position:absolute;z-index:60;top:calc(100% + 8px);left:0;width:290px;
+  background:#0a0a10;border:1px solid var(--line);border-radius:20px;padding:18px;
+  box-shadow:0 25px 60px rgba(0,0,0,.55);
+}
+.cal-pop.open{display:block}
+.cal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.cal-title{font-weight:800;font-size:1.05rem}
+.cal-sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+.cal-today{background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;border-radius:10px;padding:7px 12px;font-size:.8rem;font-weight:700}
+.cal-today:hover{background:rgba(255,255,255,.12)}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-arrow{background:none;border:0;color:#cfd6e8;font-size:1.1rem;padding:4px 8px;border-radius:8px}
+.cal-arrow:hover{background:rgba(255,255,255,.08)}
+.cal-month{font-weight:800;font-size:.92rem}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;color:#8f9cba;font-size:.72rem;font-weight:700;margin-bottom:6px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:9px;
+  color:#e7ebf5;font-size:.85rem;cursor:pointer;position:relative;background:none;border:0;font:inherit;
+}
+.cal-day:hover{background:rgba(255,255,255,.08)}
+.cal-day.muted{color:#4b5266}
+.cal-day.today:after{content:"";position:absolute;bottom:4px;width:3px;height:3px;border-radius:50%;background:var(--a)}
+.cal-day.selected{background:#e9ebf5;color:#0a0a10;font-weight:800}
+
+.testi-3d-stage{
+  position:relative;margin-top:10px;border:1px solid var(--line);border-radius:26px;
+  background:radial-gradient(120% 100% at 50% 0%,rgba(0,125,204,.10),transparent 60%),rgba(9,13,25,.6);
+  overflow:hidden;padding:44px 0;height:520px;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+}
+.testi-3d-inner{
+  height:100%;display:flex;align-items:center;justify-content:center;
+  perspective:1000px;perspective-origin:50% 30%;
+}
+.testi-columns{
+  display:flex;gap:18px;
+  transform:rotateX(24deg) rotateY(-14deg) rotateZ(8deg) scale(1.02);
+  transform-style:preserve-3d;
+}
+.testi-col{
+  display:flex;flex-direction:column;gap:18px;width:230px;flex:none;overflow:hidden;height:460px;
+}
+.testi-col-track{display:flex;flex-direction:column;gap:18px;animation:testi-vscroll var(--testi-duration,32s) linear infinite}
+.testi-col.rev .testi-col-track{animation-direction:reverse}
+.testi-3d-stage:hover .testi-col-track{animation-play-state:paused}
+.testi-empty{color:var(--muted);text-align:center;font-size:.92rem;line-height:1.7;max-width:320px}
+@keyframes testi-vscroll{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+.testi-fade-top,.testi-fade-bottom{position:absolute;left:0;right:0;height:120px;pointer-events:none;z-index:2}
+.testi-fade-top{top:0;background:linear-gradient(180deg,var(--bg2),transparent)}
+.testi-fade-bottom{bottom:0;background:linear-gradient(0deg,var(--bg2),transparent)}
+.testi-card{
+  border:1px solid var(--line);border-radius:21px;padding:22px;position:relative;overflow:hidden;flex:none;
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+  box-shadow:0 20px 45px rgba(0,0,0,.35);transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease;
+}
+.testi-card:hover{transform:translateZ(40px) scale(1.04);border-color:rgba(255,185,0,.32);box-shadow:0 30px 60px rgba(0,0,0,.45);z-index:5}
+.testi-stars{color:#FFB900;letter-spacing:2px;font-size:.85rem}
+.testi-text{margin-top:12px;color:#cfd6e8;line-height:1.7;font-size:.86rem}
+.testi-who{display:flex;align-items:center;gap:12px;margin-top:20px}
+.testi-avatar{
+  width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:.78rem;font-weight:800;
+  background:linear-gradient(135deg,var(--a),var(--b));color:#fff;
+}
+.testi-who strong{display:block;font-size:.86rem}
+.testi-who span{font-size:.76rem;color:var(--muted)}
+@media(max-width:900px){.testi-3d-stage{height:440px}.testi-col{height:380px;width:210px}}
+@media(max-width:620px){
+  .testi-3d-stage{height:380px;padding:28px 0}
+  .testi-columns{transform:rotateX(12deg) rotateY(-6deg) rotateZ(4deg)}
+  .testi-col{width:180px;height:320px}
+  .testi-card{padding:16px}
+}
+.footer{
+  position:relative;padding:56px 24px 32px;border-top:1px solid var(--line);color:#7f8aa2;
+  border-radius:32px 32px 0 0;
+  background:radial-gradient(35% 140px at 50% 0%,rgba(255,255,255,.06),transparent);
+  max-width:1180px;margin:0 auto;overflow:hidden;
+}
+.footer-glow{position:absolute;top:0;left:50%;translate:-50% -50%;width:33%;height:1px;background:rgba(255,255,255,.25);filter:blur(2px);border-radius:99px}
+.footer-top{display:grid;gap:36px;grid-template-columns:1fr}
+.footer-brand p{color:#7f8aa2;font-size:.82rem;margin-top:14px}
+.footer-cols{display:grid;grid-template-columns:repeat(2,1fr);gap:32px 24px}
+.footer-col h3{font-size:.72rem;letter-spacing:.06em;color:#cfd6e8;text-transform:uppercase}
+.footer-col ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.footer-col a{color:#7f8aa2;font-size:.85rem;transition:.25s;display:inline-flex;align-items:center;gap:6px}
+.footer-col a:hover{color:#fff}
+.footer-col svg{width:15px;height:15px;flex:none}
+.footer-bottom{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);font-size:.72rem;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.fade-up{opacity:0;filter:blur(4px);translate:0 -8px;transition:opacity .8s ease,filter .8s ease,translate .8s ease}
+.fade-up.in{opacity:1;filter:blur(0);translate:0 0}
+@media(min-width:640px){.footer-top{grid-template-columns:1fr 2fr}.footer-cols{grid-template-columns:repeat(4,1fr)}}
+
+.modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);padding:18px;opacity:0}
+.modal.open{display:grid;animation:modalBackdropIn .34s cubic-bezier(.22,1,.36,1) forwards}
+.modal-box{width:min(560px,100%);background:#0c1221;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow);transform:translateY(14px) scale(.985);opacity:0;animation:modalBoxIn .46s cubic-bezier(.22,1,.36,1) .02s forwards;position:relative;overflow:hidden}
+.modal-box::before{content:"";position:absolute;inset:-1px;pointer-events:none;border-radius:inherit;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.055) 42%,transparent 58%);transform:translateX(-125%);animation:modalSheen 1.1s cubic-bezier(.22,1,.36,1) .16s 1 forwards}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;position:relative;z-index:1}.close{background:none;border:0;color:#9ba7bf;font-size:1.5rem;transition:color .22s ease,transform .22s ease}.close:hover{color:#fff;transform:rotate(3deg) scale(1.05)}
+.modal-box .field,.modal-box .pay-options,.modal-box .secure,.modal-box .btn{position:relative;z-index:1;animation:modalContentIn .42s cubic-bezier(.22,1,.36,1) both}
+.modal-box .field:nth-child(1){animation-delay:.08s}.modal-box .field:nth-child(2){animation-delay:.13s}.modal-box .field:nth-child(3){animation-delay:.18s}
+.modal-box .row:nth-child(1) .field:nth-child(1){animation-delay:.08s}.modal-box .row:nth-child(1) .field:nth-child(2){animation-delay:.12s}.modal-box .row:nth-child(2) .field:nth-child(1){animation-delay:.16s}.modal-box .row:nth-child(2) .field:nth-child(2){animation-delay:.20s}
+.modal-box textarea{transition:border-color .22s ease,box-shadow .22s ease,background .22s ease}.modal-box input:focus,.modal-box select:focus,.modal-box textarea:focus{box-shadow:0 0 0 3px rgba(130,215,244,.07),0 0 24px rgba(130,215,244,.05)}
+@keyframes modalBackdropIn{from{opacity:0}to{opacity:1}}
+@keyframes modalBoxIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes modalContentIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes modalSheen{from{transform:translateX(-125%);opacity:0}18%{opacity:1}to{transform:translateX(125%);opacity:0}}
+@media(prefers-reduced-motion:reduce){.modal.open,.modal-box,.modal-box::before,.modal-box .field,.modal-box .pay-options,.modal-box .secure,.modal-box .btn{animation:none!important}.modal.open{opacity:1}.modal-box{opacity:1;transform:none}}
+.pay-options{display:grid;gap:10px;margin:15px 0}.pay-option{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);cursor:pointer}
+.pay-option input{accent-color:var(--a)}.secure{font-size:.72rem;color:#7e8aa5;margin:12px 0 18px}
+.success{text-align:center;padding:30px 10px}.success .check{font-size:3rem;margin-bottom:12px}
+
+.reveal{opacity:0;transform:translateY(24px);transition:.75s ease}.reveal.show{opacity:1;transform:none}
+.float{animation:float 5s ease-in-out infinite}
+.pulse{animation:pulse 2.5s infinite}
+@keyframes float{50%{transform:translateY(-9px)}}@keyframes pulse{50%{box-shadow:0 0 0 10px rgba(255,185,0,0)}}@keyframes pop{from{opacity:0;transform:scale(.97) translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:1100px) and (min-width:901px){
+ .nav-inner{gap:14px}
+ .nav-links{gap:16px;font-size:.84rem}
+ .nav-actions{gap:6px}
+ #navUserName{max-width:130px}
+ #clientAreaBtn,#navLogoutBtn{padding:9px 11px;font-size:.82rem}
+}
+@media(max-width:900px){
+ .nav-actions{display:none}
+ .mobile{display:block;background:none;border:0;color:white;font-size:1.3rem}
+ .nav-links{
+   display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:4px;
+   background:
+     radial-gradient(55% 120px at 50% 0%,rgba(0,125,204,.22),transparent),
+     linear-gradient(180deg,rgba(9,13,26,.97),rgba(6,9,18,.99));
+   backdrop-filter:blur(22px);border-bottom:1px solid var(--line);
+   padding:14px 24px 20px;overflow:hidden;
+   opacity:0;visibility:hidden;transform:translateY(-12px);
+   transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1),visibility 0s linear .35s;
+ }
+ .nav-links::before{content:"";position:absolute;top:0;left:50%;translate:-50% -50%;width:38%;height:2px;background:rgba(0,125,204,.55);filter:blur(6px);border-radius:99px}
+ .nav-links.open{
+   opacity:1;visibility:visible;transform:translateY(0);
+   transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1);
+ }
+ .nav-links a{
+   padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06);border-radius:8px;
+   opacity:0;transform:translateY(-6px);
+   transition:opacity .3s ease,transform .3s ease,background .25s ease,color .25s ease,padding-left .25s ease;
+ }
+ .nav-links a:hover:not(.nav-cta-mobile){background:rgba(255,255,255,.07);color:#fff;padding-left:18px}
+ .nav-cta-mobile:hover{filter:brightness(1.3);padding-left:18px}
+ .nav-links.open a{opacity:1;transform:translateY(0)}
+ .nav-links.open a:nth-child(1){transition-delay:.04s}
+ .nav-links.open a:nth-child(2){transition-delay:.08s}
+ .nav-links.open a:nth-child(3){transition-delay:.12s}
+ .nav-links.open a:nth-child(4){transition-delay:.16s}
+ .nav-links.open a:nth-child(5){transition-delay:.2s}
+ .nav-links.open a:nth-child(6){transition-delay:.24s}
+ .nav-cta-mobile{
+   display:block!important;font-weight:700;border-bottom:none!important;margin-top:4px;
+   background:linear-gradient(100deg,var(--a) 15%,var(--b) 42%,var(--a) 82%,var(--b) 100%);
+   background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;
+   animation:gradient-flow 6s ease-in-out infinite;
+ }
+ .hero-grid,.split,.contact{grid-template-columns:1fr}.hero{padding-top:120px}.figure{min-height:400px}
+ .cards,.pricing{grid-template-columns:1fr 1fr}.process{grid-template-columns:1fr 1fr}.step:not(:last-child):after{display:none}
+}
+.nav-cta-mobile{display:none}
+@media(max-width:620px){
+ .chip{padding:8px 12px;font-size:.8rem}
+ .cards,.pricing,.process{grid-template-columns:1fr}.hero h1{font-size:3.2rem}.hero p{font-size:.98rem}
+ .cta{padding:35px 24px}.row{grid-template-columns:1fr}
+ .modal-box{padding:20px}
+ .dt-row{flex-wrap:wrap}
+ .dt-time{width:100%}
+ .cal-pop{left:50%;translate:-50% 0;width:min(290px,86vw)}
+ .footer{padding:44px 18px 26px;border-radius:24px 24px 0 0}
+ .footer-bottom{flex-direction:column;gap:6px}
+ .testi-card{padding:20px}
+}
+@media(max-width:400px){
+ .hero h1{font-size:2.5rem}
+ .nav-inner{height:64px}
+ .logo{font-size:1.1rem}
+}
+
+/* Rating visibility fix: selected stars must remain visible after click */
+.rating-star.hovered,
+.rating-star.selected{
+  opacity:1 !important;
+}
+
+.custom-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:2px}
+.custom-checks label{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035);color:#cfd6e8;font-size:.82rem;cursor:pointer}
+.custom-checks label:has(input:checked){border-color:rgba(0,125,204,.55);background:rgba(0,125,204,.09);color:#fff}
+.custom-checks input{accent-color:var(--a)}
+@media(max-width:620px){.custom-checks{grid-template-columns:1fr}}
+
+/* ================================================================
+   WRBN DESIGN SYSTEM — MINIMAL HIERARCHY
+   Priority: outcome → action → supporting detail.
+   ================================================================ */
+body{
+  background-size:80px 80px;
+}
+body::after{opacity:.45}
+
+/* Only the primary action gets visual emphasis. */
+.btn::before{display:none}
+.btn.primary::before{display:block}
+.btn{font-weight:550;color:#d9e0ef}
+.btn.primary{font-weight:700}
+
+/* Clear type scale: one dominant headline, restrained supporting text. */
+h1{font-weight:760;max-width:760px}
+h1 .gradient{font-weight:780}
+h2{font-weight:700}
+h3{font-weight:650}
+.hero p,.section-head p,.card p,.step p,.cta p{font-weight:400}
+
+/* Small labels guide the eye; they should never compete with content. */
+.eyebrow{font-size:.76rem;font-weight:500;color:#aeb9cf;padding:6px 10px;margin-bottom:20px}
+.kicker{font-weight:500;color:#77849f;font-size:.68rem;letter-spacing:.16em}
+
+/* Reduce decorative competition. */
+.figure{background:rgba(9,13,25,.38);box-shadow:0 18px 55px rgba(0,0,0,.20)}
+.card{background:rgba(255,255,255,.025);padding:24px;transition:transform .25s,border-color .25s,background .25s}
+.card:after{opacity:.45}
+.card:hover{transform:translateY(-3px);box-shadow:none;border-color:rgba(130,215,244,.18);background:rgba(255,255,255,.035)}
+
+/* Pricing: make the decision point immediately scannable. */
+.pricing{gap:18px;align-items:stretch}
+.price{padding:27px;background:rgba(255,255,255,.025);transition:transform .25s,border-color .25s,background .25s}
+.price:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.16)}
+.price.featured{position:relative;border-color:rgba(130,215,244,.42);background:linear-gradient(145deg,rgba(0,125,204,.11),rgba(255,255,255,.025));box-shadow:0 18px 55px rgba(0,0,0,.20)}
+.price.featured:before{content:'PALING BANYAK DIPILIH';position:absolute;top:14px;right:14px;font-size:.58rem;letter-spacing:.12em;font-weight:700;color:#9fd8ff}
+.price-tag{font-weight:600;font-size:.64rem;color:#8e9bb5;background:transparent;padding:0;margin-bottom:13px;letter-spacing:.12em}
+.price.featured .price-tag{color:#9fd8ff}
+.price h3{font-size:1.25rem;font-weight:680}
+.price .amount{font-size:2.35rem;font-weight:760;margin:9px 0 16px}
+.price .amount span{font-weight:450}
+.price ul{color:#9aa6be;font-weight:400}
+.price li:before{font-weight:700}
+/* VIP extras: subtle, slow shimmer so the added value is noticed without breaking the minimal look. */
+.price li.vip-extra:before{
+  color:#bfeaff;
+  text-shadow:0 0 0 rgba(130,215,244,0);
+  animation:vipCheckShine 5.5s ease-in-out infinite;
+}
+.price li.vip-extra{
+  color:#c6cfdf;
+}
+@keyframes vipCheckShine{
+  0%,72%,100%{opacity:.72;text-shadow:0 0 0 rgba(130,215,244,0);filter:brightness(1)}
+  82%{opacity:1;text-shadow:0 0 9px rgba(130,215,244,.75),0 0 18px rgba(105,63,145,.32);filter:brightness(1.18)}
+  90%{opacity:.9;text-shadow:0 0 5px rgba(130,215,244,.38);filter:brightness(1.06)}
+}
+@media(prefers-reduced-motion:reduce){.price li.vip-extra:before{animation:none}}
+
+/* Highlight only the information clients actually need to decide. */
+.micro b{font-weight:550;color:#b8c2d7}
+.figure-caption b{font-weight:650}
+.contact-item strong{font-weight:550}
+.field label{font-weight:500}
+
+/* Primary CTA is visually dominant; secondary CTA stays quiet. */
+.hero-cta .btn.primary,.cta .btn.primary{padding:12px 19px}
+.hero-cta .btn:not(.primary){background:transparent;border-color:rgba(255,255,255,.12)}
+
+/* More breathing room makes the hierarchy feel intentional. */
+.section{padding:110px 0}
+.section-head{margin-bottom:38px}
+
+</style>
+
+
+
+<style id="client-review-styles">
+.client-review-box{margin:32px auto 0;padding:30px;border:1px solid rgba(255,255,255,.10);border-radius:24px;background:rgba(255,255,255,.035);max-width:980px;position:relative;overflow:hidden;animation:reviewBoxIn .75s cubic-bezier(.16,1,.3,1) both}
+.client-review-box::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,rgba(255,185,0,.10),transparent 42%);opacity:0;pointer-events:none;transition:opacity .5s ease}.client-review-box:hover::before{opacity:1}
+.review-heading{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;margin-bottom:24px;position:relative;z-index:1}.review-heading small{letter-spacing:.14em;opacity:.65;font-size:.72rem}.review-heading h3{margin:7px 0 5px}.review-heading p{margin:0;opacity:.68}
+.review-summary{min-width:150px;text-align:right}.review-summary strong{display:block;font-size:1.25rem}.review-summary span{display:block;opacity:.62;font-size:.85rem}.summary-stars{letter-spacing:2px;color:#FFB900;animation:starPulse 2.4s ease-in-out infinite}
+.client-review-form{display:grid;gap:16px;position:relative;z-index:1}.review-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}.review-field{display:grid;gap:8px}.review-field label{font-size:.85rem;font-weight:600}
+.review-field input,.review-field textarea{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.15);color:inherit;outline:none;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}.review-field input:focus,.review-field textarea:focus{border-color:rgba(255,185,0,.45);box-shadow:0 0 0 4px rgba(255,185,0,.06);transform:translateY(-1px)}
+.rating-input{display:flex;gap:7px;perspective:500px}.rating-star{border:0;background:none;padding:2px;font-size:2.25rem;cursor:pointer;color:rgba(255,255,255,.18);opacity:0;transform:translateY(18px) scale(.55) rotate(-18deg);animation:ratingStarIn .55s cubic-bezier(.16,1,.3,1) forwards;transition:color .2s ease,transform .25s cubic-bezier(.16,1,.3,1),filter .25s ease}
+.rating-star:nth-child(1){animation-delay:.08s}.rating-star:nth-child(2){animation-delay:.14s}.rating-star:nth-child(3){animation-delay:.20s}.rating-star:nth-child(4){animation-delay:.26s}.rating-star:nth-child(5){animation-delay:.32s}
+.rating-star:hover,.rating-star.hovered,.rating-star.selected{color:#FFB900;filter:drop-shadow(0 0 9px rgba(255,185,0,.38))}.rating-star:hover{transform:translateY(-7px) scale(1.16) rotate(2deg)}.rating-star.hovered{transform:translateY(-5px) scale(1.10)}.rating-star.selected{opacity:1;transform:translateY(-2px) scale(1.04)}
+.rating-star.selected:nth-child(1){animation:starSelect .45s ease both}.rating-star.selected:nth-child(2){animation:starSelect .45s .04s ease both}.rating-star.selected:nth-child(3){animation:starSelect .45s .08s ease both}.rating-star.selected:nth-child(4){animation:starSelect .45s .12s ease both}.rating-star.selected:nth-child(5){animation:starSelect .45s .16s ease both}
+.review-message{margin:0;min-height:20px;opacity:.72;font-size:.85rem;transition:all .25s ease}.client-review-card{position:relative;animation:reviewCardIn .65s cubic-bezier(.16,1,.3,1) both!important}.client-review-card .testi-stars{color:#FFB900;filter:drop-shadow(0 0 7px rgba(255,185,0,.25));animation:starPulse 2.6s ease-in-out infinite}.client-review-card .review-delete{margin-top:14px;border:0;background:none;color:inherit;opacity:.4;cursor:pointer;font-size:.75rem;transition:opacity .2s ease}.client-review-card .review-delete:hover{opacity:.85}
+@keyframes reviewBoxIn{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes ratingStarIn{0%{opacity:0;transform:translateY(18px) scale(.55) rotate(-18deg)}70%{opacity:1;transform:translateY(-4px) scale(1.08) rotate(3deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+@keyframes starSelect{0%{opacity:1;transform:scale(1)}45%{opacity:1;transform:scale(1.3) rotate(-6deg)}100%{opacity:1;transform:scale(1.04) rotate(0)}}
+@keyframes starPulse{0%,100%{filter:drop-shadow(0 0 3px rgba(255,185,0,.15))}50%{filter:drop-shadow(0 0 11px rgba(255,185,0,.42))}}
+@keyframes reviewCardIn{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+@media(max-width:700px){.review-heading{display:block}.review-summary{text-align:left;margin-top:18px}.review-two-col{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.client-review-box,.rating-star,.client-review-card,.summary-stars{animation:none!important;transition:none!important}}
+</style>
+<script src="/config.js"></script>
+</head>
+<body>
+<div id="velarisBackground" aria-hidden="true"><canvas id="velarisCanvas"></canvas></div>
+
+<nav class="nav" id="nav">
+  <div class="container nav-inner">
+    <a href="#home" class="logo"><span class="logo-mark"></span>WRBN</a>
+    <div class="nav-links" id="navLinks">
+      <a href="#layanan">Layanan</a><a href="#proses">Cara Kerja</a><a href="#prinsip">Prinsip</a><a href="#harga">Paket</a><a href="#tentang">Tentang</a><a href="#kontak">Kontak</a>
+      <a href="javascript:void(0)" class="nav-cta-mobile" onclick="openBooking()">Booking Konsultasi</a>
+    </div>
+    <div class="nav-actions">
+      <span id="navUserName" style="display:none"></span>
+      <button class="btn" id="clientAreaBtn" style="display:none" onclick="window.location.href='/client.html'">Client Area</button>
+      <button class="btn" id="navConsultBtn" onclick="openBooking()">Konsultasi</button>
+      <button class="btn primary" id="navStartBtn" onclick="openBooking()">Mulai Sekarang</button>
+      <button class="btn" id="navLogoutBtn" style="display:none" onclick="logoutUser()">Logout</button>
+    </div>
+    <button class="mobile" id="mobileToggle" onclick="toggleMobileNav()">☰</button>
+  </div>
+</nav>
+
+<main id="home">
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot pulse"></span> Statistical Consulting • Data to Decision</div>
+      <h1>Data yang rumit,<br><span class="gradient">jadi keputusan.</span></h1>
+      <p>WRBN membantu bisnis, organisasi, dan individu mulai dari merancang studi dan mengelola data, menganalisis dan memodelkan, sampai menerjemahkan hasilnya menjadi rekomendasi yang bisa langsung dipakai.</p>
+      <div class="hero-cta">
+        <button class="btn primary" onclick="openBooking()">Jadwalkan Konsultasi</button>
+        <a class="btn" href="#layanan">Lihat Layanan</a>
+      </div>
+      <div class="micro">
+        <span>✓ <b>Mulai sederhana</b></span><span>✓ <b>Jujur soal keterbatasan</b></span><span>✓ <b>Confidential</b></span>
+      </div>
+    </div>
+
+    <div class="figure reveal">
+      <div class="figure-cap"><span class="t">Ad spend vs. revenue</span><span class="n">Fig. 1</span></div>
+      <svg viewBox="0 0 640 380" id="scatterChart">
+        <g class="figure-axis">
+          <line x1="46" y1="336" x2="620" y2="336" stroke="var(--line)" stroke-width="1"/>
+          <line x1="46" y1="20" x2="46" y2="336" stroke="var(--line)" stroke-width="1"/>
+          <text x="46" y="352">0</text>
+          <text x="590" y="352">Ad spend</text>
+          <text x="14" y="336">0</text>
+          <text x="6" y="26">Revenue</text>
+        </g>
+        <path id="bandPath" d="M46.0 341.6 L620.0 88.5 L620.0 22.3 L46.0 299.5 Z" fill="var(--b)" opacity=".05"/>
+        <path id="lineChart" d="M46.0 320.5 L620.0 55.4" fill="none" stroke="var(--b)" stroke-width="2" stroke-dasharray="640" stroke-dashoffset="640"/>
+        <g id="dots" fill="var(--text)" opacity="0">
+          <circle cx="94.1" cy="316.6" r="3.5"/><circle cx="98.8" cy="257.0" r="3.5"/><circle cx="104.7" cy="282.1" r="3.5"/>
+          <circle cx="110.8" cy="263.7" r="3.5"/><circle cx="112.1" cy="306.8" r="3.5"/><circle cx="121.6" cy="305.1" r="3.5"/>
+          <circle cx="135.6" cy="288.8" r="3.5"/><circle cx="138.7" cy="281.6" r="3.5"/><circle cx="149.2" cy="258.7" r="3.5"/>
+          <circle cx="152.6" cy="266.3" r="3.5"/><circle cx="190.0" cy="264.9" r="3.5"/><circle cx="224.3" cy="260.5" r="3.5"/>
+          <circle cx="242.0" cy="241.4" r="3.5"/><circle cx="263.6" cy="189.0" r="3.5"/><circle cx="279.6" cy="230.1" r="3.5"/>
+          <circle cx="294.0" cy="197.8" r="3.5"/><circle cx="298.7" cy="191.1" r="3.5"/><circle cx="336.8" cy="218.8" r="3.5"/>
+          <circle cx="351.5" cy="174.6" r="3.5"/><circle cx="372.8" cy="134.0" r="3.5"/><circle cx="398.8" cy="201.3" r="3.5"/>
+          <circle cx="411.0" cy="154.7" r="3.5"/><circle cx="501.9" cy="105.4" r="3.5" fill="var(--b)"/>
+          <circle cx="518.2" cy="114.6" r="3.5"/><circle cx="564.3" cy="60.6" r="3.5"/><circle cx="579.0" cy="66.9" r="3.5"/>
+        </g>
+      </svg>
+      <div class="figure-caption">n = 26 &middot; <b>R&sup2; = 0.92</b> &middot; Setiap kenaikan 1 satuan ad spend berasosiasi dengan kenaikan ~1.76 satuan revenue.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="layanan">
+<div class="container">
+  <div class="section-head reveal"><div class="kicker">Layanan per tahap kerja</div><h2>Dari <span class="gradient">perancangan</span> sampai rekomendasi.</h2><p>Layanan kami dikelompokkan per tahap: sebelum data ada, pengelolaan data, analisis, pemodelan, komunikasi hasil, hingga peninjauan. Kami hanya menawarkan yang bisa dijaga mutunya.</p></div>
+  <div class="chip-tabs reveal" id="chipTabs">
+    <button class="chip active" data-cat="semua">Semua</button>
+    <button class="chip" data-cat="desain">Perancangan</button>
+    <button class="chip" data-cat="data">Data</button>
+    <button class="chip" data-cat="analisis">Analisis</button>
+    <button class="chip" data-cat="model">Pemodelan</button>
+    <button class="chip" data-cat="komunikasi">Komunikasi</button>
+    <button class="chip" data-cat="review">Review</button>
+    <span class="chip-pill" id="chipPill"></span>
+  </div>
+  <div class="cards" id="cardsGrid"></div>
+</div>
+</section>
+
+<section class="section" id="proses">
+<div class="container">
+  <div class="section-head reveal"><div class="kicker">Workflow</div><h2>Simple di depan.<br><span class="gradient">Serius di belakang.</span></h2><p>Klien tidak perlu pusing dengan teknis statistik. Kami memahami masalahnya dulu, menyepakati ruang lingkup, baru memilih metode. Tidak ada laporan yang dikirim sebelum diperiksa orang lain.</p></div>
+  <div class="process" id="processSteps"></div>
+</div>
+</section>
+
+<section class="section" id="tentang">
+<div class="container split">
+  <div class="section-head reveal"><div class="kicker">Kenapa WRBN?</div><h2>Karena statistik bukan cuma soal <span class="gradient">angka.</span></h2><p>Nilai konsultasi statistik ada pada kemampuan menghubungkan data dengan konteks masalah. Kami berfokus pada insight yang komunikatif, transparan, dan relevan terhadap keputusan.</p><div class="quote">“Bukan hanya menunjukkan apa yang terjadi, tetapi membantu memahami mengapa terjadi dan apa yang sebaiknya dilakukan.”</div></div>
+  <div class="panel reveal vm">
+    <div class="tiny" style="margin-bottom:12px">VISI</div>
+    <p class="vm-vision">Menjadi mitra konsultasi statistik yang membantu klien mengubah data menjadi keputusan yang jelas, jujur, dan bisa dipertanggungjawabkan.</p>
+    <div class="tiny" style="margin:22px 0 12px">MISI</div>
+    <ol class="vm-list">
+      <li><b>Pahami masalah dulu.</b> Menggali tujuan keputusan, data, dan tenggat klien sebelum memilih metode.</li>
+      <li><b>Bahasa yang bisa dipakai.</b> Menerjemahkan hasil statistik menjadi temuan dan rekomendasi yang mudah dipahami klien non-statistik.</li>
+      <li><b>Mutu yang terjaga.</b> Menerapkan review silang, daftar periksa QA, dan analisis yang bisa dijalankan ulang.</li>
+      <li><b>Transparan dan rahasia.</b> Jujur soal keterbatasan data dan hasil, serta menjaga kerahasiaan data klien.</li>
+      <li><b>Layanan sesuai kemampuan.</b> Menawarkan hanya yang bisa dijaga mutunya, dengan batas layanan yang dinyatakan sejak awal.</li>
+    </ol>
+  </div>
+</div>
+</section>
+
+<section class="section" id="prinsip">
+<div class="container">
+  <div class="section-head reveal"><div class="kicker">Prinsip & Standar Mutu</div><h2>Lima prinsip, <span class="gradient">satu standar kerja.</span></h2><p>Ini pegangan kami di setiap proyek, dari pertemuan awal sampai laporan akhir.</p></div>
+  <div class="cards">
+    <article class="card reveal"><div class="icon">01</div><h3>Pahami masalah dulu</h3><p>Kesalahan paling mahal terjadi di tahap ini, jadi kami tidak memilih metode sebelum masalahnya jelas.</p></article>
+    <article class="card reveal"><div class="icon">02</div><h3>Janjikan proses, bukan hasil</h3><p>Hasil bergantung pada data. Yang bisa kami jamin adalah proses yang benar dan terdokumentasi.</p></article>
+    <article class="card reveal"><div class="icon">03</div><h3>Jujur soal keterbatasan</h3><p>Kredibilitas dibangun dari sini. Setiap laporan memuat bagian keterbatasan secara terbuka.</p></article>
+    <article class="card reveal"><div class="icon">04</div><h3>Komunikasi lebih sering</h3><p>Kami memberi kabar lebih sering daripada yang terasa perlu, terutama saat ada perubahan atau masalah data.</p></article>
+    <article class="card reveal"><div class="icon">05</div><h3>Mulai sederhana</h3><p>Metode paling sederhana yang menjawab pertanyaan lebih baik daripada metode canggih yang sulit dijelaskan.</p></article>
+    <article class="card reveal"><div class="icon">✓</div><h3>Standar mutu</h3><p>Setiap proyek melewati pemeriksaan yang sama.</p><ul><li>Review silang sebelum dikirim</li><li>Cek asumsi & angka vs output</li><li>Kode bisa dijalankan ulang</li><li>Data mentah tidak diubah</li><li>Log keputusan metodologis</li></ul></article>
+  </div>
+</div>
+</section>
+
+<section class="section" id="harga">
+<div class="container">
+  <div class="section-head reveal"><div class="kicker">Pricing</div><h2>Pilih level bantuan yang <span class="gradient">kamu butuhkan.</span></h2><p>Contoh paket untuk website. Harga dan scope dapat disesuaikan dengan kompleksitas data.</p></div>
+  <div class="pricing" id="pricingGrid"></div>
+</div>
+</section>
+
+<section class="section" id="testimoni">
+<div class="container">
+  <div class="section-head reveal"><div class="kicker">Testimoni</div><h2>Dipercaya oleh yang sudah <span class="gradient">merasakan hasilnya.</span></h2><p>Beberapa cerita dari klien yang sebelumnya cuma punya data mentah, sekarang punya arah keputusan yang lebih jelas.</p></div>
+  <div class="testi-3d-stage reveal">
+    <div class="testi-fade-top"></div>
+    <div class="testi-3d-inner"><div class="testi-columns" id="testiGrid"></div></div>
+    <div class="testi-fade-bottom"></div>
+  </div>
+</div>
+</section>
+
+<section class="section">
+<div class="container">
+  <div class="cta reveal">
+    <div class="kicker">Ready to analyze?</div><h2>Punya data tapi belum tahu <span class="gradient">harus mulai dari mana?</span></h2>
+    <p>Kirim brief singkat. Tim WRBN akan membantu menentukan pendekatan yang paling masuk akal sebelum kamu mengambil keputusan.</p>
+    <button class="btn primary" onclick="openBooking()">Mulai Konsultasi</button>
+  </div>
+</div>
+</section>
+
+<section class="section" id="kontak">
+<div class="container">
+  <div class="section-head reveal"><div class="kicker">Contact</div><h2>Let's talk <span class="gradient">data.</span></h2><p>Untuk kebutuhan project, konsultasi akademik, bisnis, organisasi, atau analisis data lainnya.</p></div>
+  <div class="contact">
+    <div class="contact-info reveal" id="contactInfo"></div>
+    <form class="panel form reveal" onsubmit="submitContact(event)">
+      <div class="row">
+        <div class="field"><label>NAMA</label><input id="name" required placeholder="Nama kamu"></div>
+        <div class="field"><label>EMAIL</label><input id="email" type="email" required placeholder="nama@email.com"></div>
+      </div>
+      <div class="field"><label>KEBUTUHAN</label><select id="need"><option>Perancangan studi / survei / sampel</option><option>Pengelolaan & pembersihan data</option><option>Analisis deskriptif & inferensial</option><option>Pemodelan statistik</option><option>Laporan, visualisasi & presentasi</option><option>Review analisis / pendampingan</option><option>Lainnya</option></select></div>
+      <div class="field"><label>CERITAKAN SINGKAT</label><textarea id="message" required placeholder="Contoh: Saya punya data penjualan 2 tahun dan ingin mengetahui faktor yang memengaruhi penjualan."></textarea></div>
+      <button class="btn primary" type="submit">Kirim Brief</button>
+      <div class="form-note">Dengan mengirim form, data hanya digunakan untuk menindaklanjuti permintaan konsultasi. Untuk production, hubungkan form ini ke backend/CRM dan tambahkan consent + privacy policy.</div>
+    </form>
+  </div>
+</div>
+</section>
+</main>
+
+<footer class="footer">
+<div class="footer-glow"></div>
+<div class="footer-top">
+  <div class="footer-brand fade-up">
+    <a class="logo" href="#home"><span class="logo-mark"></span>WRBN</a>
+    <p>Data to Decision.<br>© <span id="footerYear"></span> WRBN. All rights reserved.</p>
+  </div>
+  <div class="footer-cols" id="footerCols"></div>
+</div>
+<div class="footer-bottom">
+  <span>Dibuat dengan data & kopi ☕</span>
+  <span>WRBN, statistical consulting studio</span>
+</div>
+</footer>
+
+<div class="modal" id="authModal" onclick="if(event.target===this)closeModal('authModal')">
+ <div class="modal-box">
+  <div class="modal-head"><div><div class="kicker" id="authKicker">ACCESS</div><h3 id="authTitle">Login</h3></div><button class="close" onclick="closeModal('authModal')">×</button></div>
+  <form class="form" id="authForm">
+   <div class="field"><label>EMAIL</label><input id="authEmail" type="email" required autocomplete="email" placeholder="nama@email.com"></div>
+   <div class="field" id="authNameField" style="display:none"><label>NAMA</label><input id="authName" maxlength="100" autocomplete="name" placeholder="Nama kamu"></div>
+   <div class="field"><label>PASSWORD</label><input id="authPassword" type="password" required minlength="8" autocomplete="current-password" placeholder="Minimal 8 karakter"></div>
+   <div class="field" id="authConfirmField" style="display:none"><label>KONFIRMASI PASSWORD</label><input id="authConfirm" type="password" minlength="8" autocomplete="new-password" placeholder="Ulangi password"></div>
+   <button class="btn primary" type="submit" id="authSubmit">Login</button>
+   <p id="authMessage" class="form-note"></p>
+   <button type="button" class="btn" style="width:100%" id="authSwitch">Belum punya akun? Register</button>
+  </form>
+ </div>
+</div>
+
+<div class="modal" id="bookingModal" onclick="if(event.target===this)closeModal('bookingModal')">
+ <div class="modal-box">
+  <div class="modal-head"><div><div class="kicker">BOOKING</div><h3>Jadwalkan konsultasi</h3></div><button class="close" onclick="closeModal('bookingModal')">×</button></div>
+  <form class="form" onsubmit="goPayment(event)">
+    <div class="row"><div class="field"><label>NAMA</label><input id="bookingNama" required placeholder="Nama kamu"></div><div class="field"><label>WHATSAPP</label><input id="bookingWA" required placeholder="08xxxxxxxxxx"></div></div>
+    <div class="row"><div class="field"><label>PAKET</label><select id="bookingPackage"><option value="Basic">Basic (Rp199K mulai)</option><option value="VIP">VIP (Rp399K mulai)</option><option value="Custom">Custom (Rp199K+)</option></select></div><div class="field cal-field">
+      <label>JADWAL</label>
+      <div class="dt-row">
+        <button type="button" class="dt-trigger" id="dtTrigger"><span id="dtDisplay">Pilih tanggal</span></button>
+        <input type="time" id="bookingTime" class="dt-time" required>
+      </div>
+      <input type="hidden" id="bookingJadwal" required>
+      <div class="cal-pop" id="calPop">
+        <div class="cal-head">
+          <div><div class="cal-title">Appointment</div><div class="cal-sub">Find a date</div></div>
+          <button type="button" class="cal-today" id="calToday">Today</button>
+        </div>
+        <div class="cal-nav">
+          <button type="button" class="cal-arrow" id="calPrev">‹</button>
+          <div class="cal-month" id="calMonthLabel"></div>
+          <button type="button" class="cal-arrow" id="calNext">›</button>
+        </div>
+        <div class="cal-weekdays">
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+    </div></div>
+    <div class="field"><label>CATATAN</label><textarea id="bookingCatatan" placeholder="Ceritakan kebutuhan singkat..."></textarea></div>
+    <button class="btn primary" type="submit" id="bookingSubmitBtn">Lanjut ke Pembayaran</button>
+  </form>
+ </div>
+</div>
+
+<div class="modal" id="customModal" onclick="if(event.target===this)closeModal('customModal')">
+ <div class="modal-box" style="width:min(720px,100%)">
+  <div class="modal-head"><div><div class="kicker">CUSTOM PACKAGE</div><h3>Build Your Own Analysis</h3></div><button class="close" onclick="closeModal('customModal')">×</button></div>
+  <form class="form" onsubmit="submitCustomPackage(event)">
+   <div class="field"><label>JENIS ANALISIS</label><div class="custom-checks">
+    <label><input type="checkbox" name="customAnalysis" value="Deskriptif"> Deskriptif</label>
+    <label><input type="checkbox" name="customAnalysis" value="Uji Hipotesis"> Uji Hipotesis</label>
+    <label><input type="checkbox" name="customAnalysis" value="Regresi"> Regresi</label>
+    <label><input type="checkbox" name="customAnalysis" value="Time Series / Forecasting"> Time Series / Forecasting</label>
+    <label><input type="checkbox" name="customAnalysis" value="Machine Learning"> Machine Learning</label>
+    <label><input type="checkbox" name="customAnalysis" value="Geospatial"> Geospatial</label>
+    <label><input type="checkbox" name="customAnalysis" value="Financial Modelling"> Financial Modelling</label>
+    <label><input type="checkbox" name="customAnalysis" value="Advanced / Deep Learning"> Advanced / Deep Learning</label>
+   </div></div>
+   <div class="field"><label>OUTPUT YANG DIBUTUHKAN</label><div class="custom-checks">
+    <label><input type="checkbox" name="customOutput" value="Tabel hasil"> Tabel hasil</label>
+    <label><input type="checkbox" name="customOutput" value="Visualisasi"> Visualisasi</label>
+    <label><input type="checkbox" name="customOutput" value="Interpretasi"> Interpretasi</label>
+    <label><input type="checkbox" name="customOutput" value="Prediction / Forecast"> Prediction / Forecast</label>
+    <label><input type="checkbox" name="customOutput" value="Laporan lengkap"> Laporan lengkap</label>
+    <label><input type="checkbox" name="customOutput" value="Dashboard"> Dashboard</label>
+   </div></div>
+   <div class="row"><div class="field"><label>BUDGET (OPSIONAL)</label><input id="customBudget" type="number" min="0" step="50000" placeholder="Contoh: 400000"></div><div class="field"><label>DEADLINE</label><input id="customDeadline" type="date"></div></div>
+   <div class="field"><label>CERITAKAN KEBUTUHAN</label><textarea id="customDescription" required placeholder="Contoh: Saya punya data penjualan 3 tahun dan ingin mengetahui faktor yang memengaruhi penjualan lalu memprediksi 6 bulan ke depan."></textarea></div>
+   <button class="btn primary" style="width:100%" type="submit">Kirim Permintaan Custom</button>
+   <div class="form-note">Harga final akan ditentukan setelah tim WRBN meninjau kompleksitas data, metode, output, dan deadline.</div>
+  </form>
+ </div>
+</div>
+
+<div class="modal" id="paymentModal" onclick="if(event.target===this)closeModal('paymentModal')">
+ <div class="modal-box" id="paymentBox">
+  <div class="modal-head"><div><div class="kicker">CHECKOUT</div><h3>Pembayaran</h3></div><button class="close" onclick="closeModal('paymentModal')">×</button></div>
+  <div id="paymentSummary" style="padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);display:flex;justify-content:space-between"><span>Paket</span><strong>—</strong></div>
+  <div class="pay-options">
+   <label class="pay-option"><input type="radio" name="pay" value="qris" checked> QRIS</label>
+   <label class="pay-option"><input type="radio" name="pay" value="virtual_account"> Virtual Account</label>
+   <label class="pay-option"><input type="radio" name="pay" value="ewallet"> E-Wallet</label>
+  </div>
+  <div class="secure">🔒 Demo checkout. Untuk production, gunakan payment gateway resmi (mis. Midtrans/Xendit) dan jangan pernah menyimpan data kartu/payment credential di frontend.</div>
+  <button class="btn primary" id="payNowBtn" style="width:100%" onclick="finishPayment()">Bayar Sekarang</button><p id="paymentMessage" class="form-note" style="margin:10px 0 0"></p>
+ </div>
+</div>
+
+<script>
+// ================================================================
+// GANTI ANGKA DI SINI AJA buat update data figure/scatter chart di hero.
+// Titik-titik (<circle>) dan garis (#lineChart) ada langsung di markup SVG
+// di atas kalau mau diganti datanya.
+// ================================================================
+(function(){
+  const line = document.getElementById('lineChart');
+  const dots = document.getElementById('dots');
+  requestAnimationFrame(()=>{
+    line.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.22,1,.36,1)';
+    line.style.strokeDashoffset = '0';
+    dots.style.transition = 'opacity .9s ease .6s';
+    dots.style.opacity = '1';
+  });
+})();
+
+// ================================================================
+// GANTI ISI WEBSITE DI SINI AJA. Semua teks di section Layanan,
+// Proses, Pricing, Testimoni, Kontak, dan Footer diambil dari
+// object-object di bawah ini, nggak perlu edit HTML sama sekali.
+// ================================================================
+
+const SERVICES_CONFIG = [
+  { cat:'desain', icon:'◇', title:'Perancangan Studi & Survei', desc:'Menyiapkan dasar penelitian sebelum data dikumpulkan, supaya data yang masuk memang bisa dianalisis.', points:['Desain penelitian, variabel & pengukuran','Kuesioner dan skala','Perencanaan analisis sejak awal'] },
+  { cat:'desain', icon:'▦', title:'Sampel & Eksperimen', desc:'Menentukan seberapa banyak dan bagaimana data diambil agar kesimpulannya bisa dipercaya.', points:['Ukuran sampel & teknik sampling','Perancangan eksperimen (RAL, RAK, faktorial)','Analisis ukuran efek & power'] },
+  { cat:'data', icon:'⌗', title:'Pengelolaan Data', desc:'Merapikan data mentah menjadi data yang siap dianalisis, lengkap dengan dokumentasinya.', points:['Pembersihan: missing, duplikat, salah input','Integrasi data & kamus data','Skrip otomatis & dashboard sederhana'] },
+  { cat:'analisis', icon:'◒', title:'Analisis Deskriptif & Eksplorasi', desc:'Memberi gambaran awal data: pola, hubungan, dan anomali yang perlu diperhatikan.', points:['Ringkasan statistik & profil data','Visualisasi: grafik, peta, infografis','Crosstab & segmentasi sederhana'] },
+  { cat:'analisis', icon:'Σ', title:'Analisis Inferensial', desc:'Menjawab “apakah perbedaan atau hubungan ini nyata?” dengan metode yang sesuai.', points:['Uji t, ANOVA, chi-square, nonparametrik','Estimasi & interval kepercayaan','Korelasi, validitas & reliabilitas instrumen'] },
+  { cat:'model', icon:'↗', title:'Pemodelan Statistik', desc:'Membangun model untuk menjelaskan hubungan antarvariabel dan memperkirakan kondisi ke depan.', points:['Regresi linier, berganda, logistik, Poisson','Deret waktu & peramalan','Evaluasi model: AIC/BIC, validasi silang, residual'] },
+  { cat:'model', icon:'⌁', title:'Pemodelan Lanjutan', desc:'Untuk struktur data yang lebih kompleks, dipilih hanya bila memang diperlukan.', points:['PCA, analisis faktor, cluster, diskriminan','Model berjenjang, data panel, survival','SEM / analisis jalur & ML dasar dengan validasi'] },
+  { cat:'komunikasi', icon:'✦', title:'Interpretasi & Komunikasi', desc:'Mengubah output statistik menjadi bahasa klien dan rekomendasi yang bisa ditindaklanjuti.', points:['Laporan & ringkasan eksekutif','Presentasi ke klien atau pimpinan','Rekomendasi berbasis data & pelatihan singkat'] },
+  { cat:'review', icon:'◌', title:'Peninjauan & Pendampingan', desc:'Memeriksa dan mendampingi analisis yang sudah atau sedang berjalan.', points:['Review analisis pihak lain & audit kualitas data','Pendampingan skripsi, tesis, riset organisasi','Bantuan menjawab komentar reviewer'] },
+];
+
+const PROCESS_CONFIG = [
+  { num:'01 / BRIEF', title:'Pertemuan awal & ruang lingkup', desc:'Kami menggali masalah, tujuan keputusan, data, dan tenggat, lalu menyepakati luaran, asumsi, batasan, jadwal, dan mekanisme revisi.' },
+  { num:'02 / ANALYZE', title:'Olah & analisis data', desc:'Data dibersihkan dan dianalisis dengan metode paling sederhana yang menjawab pertanyaan. Data mentah tidak diubah, kode bisa dijalankan ulang.' },
+  { num:'03 / REVIEW', title:'QA & review silang', desc:'Asumsi dicek, angka di laporan dicocokkan dengan output, dan setiap pilihan metode dicatat alasannya sebelum dikirim.' },
+  { num:'04 / REPORT', title:'Laporan & rekomendasi', desc:'Ringkasan eksekutif, temuan utama, metode, keterbatasan, dan rekomendasi, ditulis agar mudah dibaca klien non-statistik.' },
+];
+
+const PRICING_CONFIG = [
+  { tag:'BASIC', title:'Basic', price:'Rp199K', unit:'mulai', features:['Pengolahan data sederhana','Perhitungan statistik','Hasil / nilai analisis','Kesimpulan hasil','1x revisi'], cta:'Pilih Basic', pkg:'Basic', featured:false },
+  { tag:'MOST POPULAR', title:'VIP', price:'Rp399K', unit:'mulai', features:['Semua fasilitas Basic','Data cleaning & EDA','Visualisasi & grafik','Interpretasi & insight','Prediction / forecasting*','Rekomendasi & laporan','2x revisi'], cta:'Pilih VIP', pkg:'VIP', featured:true },
+  { tag:'CUSTOM', title:'Custom', price:'Rp199K+', unit:'sesuai kebutuhan', features:['Pilih metode analisis','Pilih output yang dibutuhkan','Add-on visualisasi / report','ML, geospatial & advanced analysis','Harga berdasarkan kompleksitas'], cta:'Buat Custom', pkg:'Custom', featured:false },
+];
+
+const TESTIMONIALS_CONFIG = [
+  { text:'Awalnya bingung mau ngolah data skripsi dari mana. Setelah konsultasi, semua jadi jelas, bahkan hasil analisisnya gampang dijelasin ke dosen penguji.', initials:'RA', name:'Rani A.', role:'Mahasiswa Statistika' },
+  { text:'Dashboard yang dibikin enak banget dipahami tim non-teknis. Insight-nya juga actionable, bukan cuma angka doang.', initials:'DP', name:'Dimas P.', role:'Owner UMKM' },
+  { text:'Suka sama cara mereka jelasin kenapa hasilnya begitu, bukan cuma kasih output. Jadi ngerti risiko dan tingkat keyakinannya juga.', initials:'SN', name:'Sinta N.', role:'Peneliti' },
+];
+
+const CONTACT_CONFIG = [
+  { label:'Email', value:'hello@WRBNstat.id' },
+  { label:'WhatsApp', value:'+62 812-0000-0000' },
+  { label:'Response time', value:'Senin–Sabtu • 09.00–20.00 WIB' },
+  { label:'Privacy', value:'Data klien bersifat confidential' },
+];
+
+// icon key bisa: facebook, instagram, youtube, linkedin
+const FOOTER_CONFIG = [
+  { title:'Layanan', links:[
+    { label:'Perancangan & Sampel', href:'#layanan' },
+    { label:'Data & Analisis', href:'#layanan' },
+    { label:'Pemodelan', href:'#layanan' },
+    { label:'Review & Pendampingan', href:'#layanan' },
+  ]},
+  { title:'Perusahaan', links:[
+    { label:'Visi & Misi', href:'#tentang' },
+    { label:'Prinsip Kami', href:'#prinsip' },
+    { label:'FAQ', href:'#faq' },
+    { label:'Kebijakan Privasi', href:'#', onclick:"alert('Privacy Policy demo. Tambahkan kebijakan privasi resmi sebelum production.')" },
+    { label:'Syarat Layanan', href:'#', onclick:"alert('Terms demo. Tambahkan syarat layanan resmi sebelum production.')" },
+  ]},
+  { title:'Sumber Daya', links:[
+    { label:'Blog', href:'#' },
+    { label:'Studi Kasus', href:'#' },
+    { label:'Panduan', href:'#' },
+    { label:'Bantuan', href:'#kontak' },
+  ]},
+  { title:'Sosial', links:[
+    { label:'Facebook', href:'#', icon:'facebook' },
+    { label:'Instagram', href:'#', icon:'instagram' },
+    { label:'Youtube', href:'#', icon:'youtube' },
+    { label:'LinkedIn', href:'#', icon:'linkedin' },
+  ]},
+];
+
+const SOCIAL_ICONS = {
+  facebook:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
+  instagram:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>',
+  youtube:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.5 6.2a3 3 0 0 0-2.1-2.1C18.5 3.5 12 3.5 12 3.5s-6.5 0-8.4.6A3 3 0 0 0 1.5 6.2 31 31 0 0 0 1 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 8.4.6 8.4.6s6.5 0 8.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 23 12a31 31 0 0 0-.5-5.8Z"/><path d="M9.8 15.5V8.5l6 3.5-6 3.5Z"/></svg>',
+  linkedin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6Z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>',
+};
+
+function renderServices(list){
+  document.getElementById('cardsGrid').innerHTML = list.map(s => `
+    <article class="card reveal" data-cat="${s.cat}">
+      <div class="icon">${s.icon}</div><h3>${s.title}</h3><p>${s.desc}</p>
+      <ul>${s.points.map(p=>`<li>${p}</li>`).join('')}</ul>
+    </article>`).join('');
+}
+
+function renderProcess(list){
+  document.getElementById('processSteps').innerHTML = list.map(s => `
+    <div class="step reveal"><div class="num">${s.num}</div><h3>${s.title}</h3><p>${s.desc}</p></div>`).join('');
+}
+
+function renderPricing(list){
+  document.getElementById('pricingGrid').innerHTML = list.map(p => `
+    <div class="price${p.featured?' featured':''} reveal">
+      <span class="price-tag">${p.tag}</span><h3>${p.title}</h3>
+      <div class="amount">${p.price} ${p.unit?`<span>${p.unit}</span>`:''}</div>
+      <ul>${p.features.map((f,i)=>`<li class="${p.pkg==='VIP' && i>0 ? 'vip-extra':''}">${f}</li>`).join('')}</ul>
+      <button class="btn${p.featured?' primary':''}" style="width:100%" onclick="${p.pkg==='Custom'?'openCustomPackage()':`openBooking('${p.pkg}')`}">${p.cta}</button>
+    </div>`).join('');
+}
+
+function renderTestimonials(list){
+  const grid = document.getElementById('testiGrid');
+  if(!grid) return;
+  if(!list.length){
+    grid.innerHTML = `<div class="testi-empty">Belum ada review dari klien.<br>Jadilah yang pertama mengisi form di bawah ini.</div>`;
+    return;
+  }
+  const cols = window.innerWidth <= 620 ? 2 : (window.innerWidth <= 900 ? 3 : 4);
+  const buckets = Array.from({length:cols}, () => []);
+  list.forEach((t,i) => buckets[i % cols].push(t));
+  const cardHTML = (t) => `
+    <article class="testi-card${t.isClient ? ' client-review-card' : ''}">
+      <div class="testi-stars">${'★'.repeat(t.rating||5)}${'☆'.repeat(5-(t.rating||5))}</div>
+      <p class="testi-text">"${esc(t.text)}"</p>
+      <div class="testi-who"><div class="testi-avatar">${esc(t.initials)}</div><div><strong>${esc(t.name)}</strong><span>${esc(t.role)}</span></div></div>
+      ${t.isClient ? `<button type="button" class="review-delete" data-review-id="${t.id}">Hapus review ini</button>` : ''}
+    </article>`;
+  grid.innerHTML = buckets.filter(b=>b.length).map((b,ci) => {
+    const dup = b.concat(b); // duplicated so the vertical scroll can loop seamlessly at -50%
+    const dur = Math.max(18, b.length * 8);
+    return `<div class="testi-col${ci % 2 ? ' rev' : ''}"><div class="testi-col-track" style="--testi-duration:${dur}s">${dup.map(cardHTML).join('')}</div></div>`;
+  }).join('');
+  grid.querySelectorAll('.review-delete').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.reviewId;
+      saveClientReviews(getClientReviews().filter(x => String(x.id) !== String(id)));
+      renderAllTestimonials();
+    });
+  });
+}
+
+function renderAllTestimonials(){
+  const client = getClientReviews().map(x => ({...x, isClient:true}));
+  renderTestimonials(client);
+  updateReviewSummary(client);
+}
+
+function renderContactInfo(list){
+  document.getElementById('contactInfo').innerHTML = list.map(c => `
+    <div class="contact-item"><small>${c.label}</small><strong>${c.value}</strong></div>`).join('');
+}
+
+function renderFooter(cols){
+  document.getElementById('footerCols').innerHTML = cols.map((col,i) => `
+    <div class="footer-col fade-up" ${i?`style="transition-delay:${(i*0.08).toFixed(2)}s"`:''}>
+      <h3>${col.title}</h3>
+      <ul>${col.links.map(l => `<li><a href="${l.href}"${l.onclick?` onclick="${l.onclick}"`:''}>${l.icon?SOCIAL_ICONS[l.icon]:''}${l.label}</a></li>`).join('')}</ul>
+    </div>`).join('');
+}
+
+renderServices(SERVICES_CONFIG);
+renderProcess(PROCESS_CONFIG);
+renderPricing(PRICING_CONFIG);
+renderContactInfo(CONTACT_CONFIG);
+renderFooter(FOOTER_CONFIG);
+
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+const observer=new IntersectionObserver(entries=>{
+ entries.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('show');
+   e.target.querySelectorAll?.('.fill').forEach(x=>x.style.width=x.dataset.width);
+  }
+ });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(x=>observer.observe(x));
+
+const API_BASE=(window.WRBN_CONFIG?.API_BASE_URL||'')+'/api';
+let currentUser=null;
+let pendingPaymentId=null;
+let authMode='login';
+
+async function api(path,options={}){
+ const opts={...options,headers:{'Content-Type':'application/json',...(options.headers||{})},credentials:'include'};
+ const res=await fetch(API_BASE+path,opts);
+ let data={};
+ try{data=await res.json()}catch{}
+ if(!res.ok)throw new Error(data.message||'Request gagal');
+ return data;
+}
+
+async function refreshSession(){
+ try{currentUser=(await api('/auth/me')).user||null}catch{currentUser=null}
+ const b=document.getElementById('clientAreaBtn');
+ const l=document.getElementById('navLogoutBtn');
+ const n=document.getElementById('navUserName');
+ if(b)b.style.display=currentUser?'inline-flex':'none';
+ if(l)l.style.display=currentUser?'inline-flex':'none';
+ const c=document.getElementById('navConsultBtn');
+ const s=document.getElementById('navStartBtn');
+ if(c)c.style.display=currentUser?'none':'inline-flex';
+ if(s)s.style.display=currentUser?'none':'inline-flex';
+ if(n){n.style.display=currentUser?'inline-flex':'none';n.textContent=currentUser?currentUser.name:'';}
+ return currentUser;
+}
+
+async function logoutUser(){
+ try{await api('/auth/logout',{method:'POST'})}catch(e){}
+ currentUser=null;
+ await refreshSession();
+ alert('Kamu sudah logout.');
+}
+
+function openAuth(mode='login'){
+ authMode=mode;
+ const reg=mode==='register';
+ document.getElementById('authTitle').textContent=reg?'Register':'Login';
+ document.getElementById('authKicker').textContent=reg?'CREATE ACCOUNT':'ACCESS';
+ document.getElementById('authSubmit').textContent=reg?'Register':'Login';
+ document.getElementById('authNameField').style.display=reg?'':'none';
+ document.getElementById('authConfirmField').style.display=reg?'':'none';
+ document.getElementById('authPassword').autocomplete=reg?'new-password':'current-password';
+ document.getElementById('authSwitch').textContent=reg?'Sudah punya akun? Login':'Belum punya akun? Register';
+ document.getElementById('authMessage').textContent='';
+ document.getElementById('authForm').reset();
+ document.getElementById('authModal').classList.add('open');
+}
+
+document.getElementById('authSwitch').addEventListener('click',()=>openAuth(authMode==='login'?'register':'login'));
+
+document.getElementById('authForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const btn=document.getElementById('authSubmit'),msg=document.getElementById('authMessage');
+ const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;
+ btn.disabled=true;msg.textContent='Memproses...';
+ try{
+  let r;
+  if(authMode==='register'){
+   const name=document.getElementById('authName').value.trim();
+   const confirm=document.getElementById('authConfirm').value;
+   if(password!==confirm)throw new Error('Konfirmasi password tidak sama.');
+   r=await api('/auth/register',{method:'POST',body:JSON.stringify({name,email,password})});
+  }else{
+   r=await api('/auth/login',{method:'POST',body:JSON.stringify({email,password})});
+  }
+  currentUser=r.user;
+  refreshSession();
+  closeModal('authModal');
+  if(window.__afterAuth){const cb=window.__afterAuth;window.__afterAuth=null;cb();}
+  else if(authMode==='login')alert(`Selamat datang, ${currentUser.name}.`);
+ }catch(err){msg.textContent=err.message}
+ finally{btn.disabled=false}
+});
+
+function openBooking(pkg){
+ const proceed=()=>{
+  document.getElementById('bookingModal').classList.add('open');
+  const name=document.getElementById('bookingNama');
+  if(name&&currentUser)name.value=currentUser.name||'';
+  if(pkg){
+   const s=document.getElementById('bookingPackage');
+   [...s.options].forEach(o=>{
+    if(o.textContent.toLowerCase().includes(String(pkg).toLowerCase()))s.value=o.value
+   });
+  }
+ };
+ if(!currentUser){
+  window.__afterAuth=proceed;
+  openAuth('login');
+  return;
+ }
+ proceed();
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+async function goPayment(e){
+ e.preventDefault();
+ if(!currentUser){
+  closeModal('bookingModal');
+  window.__afterAuth=()=>openBooking();
+  return openAuth('login');
+ }
+ const btn=document.getElementById('bookingSubmitBtn');
+ btn.disabled=true;btn.textContent='Menyimpan...';
+ try{
+  const pkg=document.getElementById('bookingPackage').value;
+  const sr=await api('/services');
+  const found=sr.services.find(x=>x.name===pkg);
+  if(!found)throw new Error('Paket tidak ditemukan di backend. Jalankan npm run db:init terlebih dahulu.');
+  const r=await api('/payments',{
+   method:'POST',
+   body:JSON.stringify({
+    serviceId:found.id,
+    scheduledAt:document.getElementById('bookingJadwal').value,
+    notes:document.getElementById('bookingCatatan').value.trim(),
+    whatsapp:document.getElementById('bookingWA').value.trim()
+   })
+  });
+  pendingPaymentId=r.payment.id;
+  const paymentSummary=document.getElementById('paymentSummary');
+  if(paymentSummary) paymentSummary.innerHTML=`<span>${esc(found.name)}</span><strong>${found.priceLabel}</strong>`;
+  const paymentMessage=document.getElementById('paymentMessage');
+  if(paymentMessage) paymentMessage.textContent='';
+  closeModal('bookingModal');
+  document.getElementById('paymentModal').classList.add('open');
+ }catch(err){alert(err.message)}
+ finally{btn.disabled=false;btn.textContent='Lanjut ke Pembayaran'}
+}
+
+async function finishPayment(){
+ if(!pendingPaymentId)return;
+ const btn=document.getElementById('payNowBtn'),msg=document.getElementById('paymentMessage');
+ btn.disabled=true;btn.textContent='Memproses...';
+ try{
+  const method=document.querySelector('input[name="pay"]:checked')?.value||'qris';
+  const r=await api(`/payments/${pendingPaymentId}/dummy-pay`,{
+   method:'POST',
+   body:JSON.stringify({method})
+  });
+  if(r.payment.status!=='paid')throw new Error('Pembayaran belum berhasil.');
+  document.getElementById('paymentBox').innerHTML=`<div class="success"><div class="check">✓</div><h3>Pembayaran berhasil</h3><p style="color:#9ba7c2;line-height:1.6;margin:10px 0 20px">Pembayaran sudah diverifikasi oleh backend. Client Area sekarang dapat diakses.</p><button class="btn primary" onclick="window.location.href='/client.html'">Buka Client Area</button></div>`;
+ }catch(err){msg.textContent=err.message;btn.disabled=false;btn.textContent='Bayar Sekarang'}
+}
+
+function openCustomPackage(){
+ if(!currentUser){
+  window.__afterAuth=()=>document.getElementById('customModal').classList.add('open');
+  return openAuth('login');
+ }
+ document.getElementById('customModal').classList.add('open');
+}
+
+function submitCustomPackage(e){
+ e.preventDefault();
+ const analysis=[...document.querySelectorAll('input[name="customAnalysis"]:checked')].map(x=>x.value);
+ const output=[...document.querySelectorAll('input[name="customOutput"]:checked')].map(x=>x.value);
+ const budget=document.getElementById('customBudget').value;
+ const deadline=document.getElementById('customDeadline').value;
+ const description=document.getElementById('customDescription').value.trim();
+ if(!analysis.length){alert('Pilih minimal satu jenis analisis.');return;}
+ closeModal('customModal');
+ document.getElementById('bookingPackage').value='Custom';
+ document.getElementById('bookingCatatan').value=`CUSTOM PACKAGE
+Analisis: ${analysis.join(', ')}
+Output: ${output.length?output.join(', '):'Belum ditentukan'}
+Budget: ${budget?`Rp${Number(budget).toLocaleString('id-ID')}`:'Belum ditentukan'}
+Deadline: ${deadline||'Belum ditentukan'}
+Kebutuhan: ${description}`;
+ openBooking('Custom');
+}
+
+refreshSession().catch(()=>{});
+// ===== Custom calendar for JADWAL field =====
+(function(){
+  const trigger=document.getElementById('dtTrigger');
+  const pop=document.getElementById('calPop');
+  const grid=document.getElementById('calGrid');
+  const monthLabel=document.getElementById('calMonthLabel');
+  const display=document.getElementById('dtDisplay');
+  const hidden=document.getElementById('bookingJadwal');
+  const timeInput=document.getElementById('bookingTime');
+  const btnPrev=document.getElementById('calPrev');
+  const btnNext=document.getElementById('calNext');
+  const btnToday=document.getElementById('calToday');
+
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const today=new Date();
+  let viewYear=today.getFullYear(), viewMonth=today.getMonth();
+  let selected=null;
+
+  function pad(n){return String(n).padStart(2,'0')}
+
+  function updateHidden(){
+    if(!selected) return;
+    const t=timeInput.value || '00:00';
+    hidden.value=`${selected.getFullYear()}-${pad(selected.getMonth()+1)}-${pad(selected.getDate())}T${t}`;
+    display.textContent=`${selected.getDate()} ${monthNames[selected.getMonth()]} ${selected.getFullYear()}`;
+  }
+
+  function render(){
+    monthLabel.textContent=`${monthNames[viewMonth]} ${viewYear}`;
+    grid.innerHTML='';
+    const firstDay=new Date(viewYear,viewMonth,1).getDay();
+    const daysInMonth=new Date(viewYear,viewMonth+1,0).getDate();
+    const daysInPrevMonth=new Date(viewYear,viewMonth,0).getDate();
+
+    const cells=[];
+    for(let i=firstDay-1;i>=0;i--){
+      cells.push({day:daysInPrevMonth-i,muted:true,month:viewMonth-1});
+    }
+    for(let d=1;d<=daysInMonth;d++){
+      cells.push({day:d,muted:false,month:viewMonth});
+    }
+    let next=1;
+    while(cells.length%7!==0){
+      cells.push({day:next++,muted:true,month:viewMonth+1});
+    }
+
+    cells.forEach(c=>{
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='cal-day'+(c.muted?' muted':'');
+      btn.textContent=c.day;
+      const cellDate=new Date(viewYear,c.month,c.day);
+      if(cellDate.toDateString()===today.toDateString()) btn.classList.add('today');
+      if(selected && cellDate.toDateString()===selected.toDateString()) btn.classList.add('selected');
+      btn.addEventListener('click',()=>{
+        selected=cellDate;
+        if(c.muted){viewYear=cellDate.getFullYear();viewMonth=cellDate.getMonth();}
+        updateHidden();
+        render();
+        pop.classList.remove('open');
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  trigger.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    pop.classList.toggle('open');
+  });
+  timeInput.addEventListener('change',updateHidden);
+  btnPrev.addEventListener('click',()=>{viewMonth--;if(viewMonth<0){viewMonth=11;viewYear--;}render();});
+  btnNext.addEventListener('click',()=>{viewMonth++;if(viewMonth>11){viewMonth=0;viewYear++;}render();});
+  btnToday.addEventListener('click',()=>{
+    viewYear=today.getFullYear();viewMonth=today.getMonth();
+    selected=new Date(today);
+    updateHidden();render();
+  });
+  document.addEventListener('click',(e)=>{
+    if(!pop.contains(e.target) && e.target!==trigger) pop.classList.remove('open');
+  });
+
+  render();
+})();
+
+// ===== Footer: dynamic year + scroll-in animation =====
+(function(){
+  const yearEl=document.getElementById('footerYear');
+  if(yearEl) yearEl.textContent=new Date().getFullYear();
+
+  const items=document.querySelectorAll('.footer .fade-up');
+  if('IntersectionObserver' in window){
+    const obs=new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting){en.target.classList.add('in');obs.unobserve(en.target);}
+      });
+    },{threshold:.15});
+    items.forEach(el=>obs.observe(el));
+  } else {
+    items.forEach(el=>el.classList.add('in'));
+  }
+})();
+
+// ===== Mobile nav toggle =====
+function toggleMobileNav(){
+  const nav=document.getElementById('navLinks');
+  const btn=document.getElementById('mobileToggle');
+  const open=nav.classList.toggle('open');
+  btn.textContent=open?'✕':'☰';
+}
+document.getElementById('navLinks').addEventListener('click',(e)=>{
+  if(e.target.tagName==='A'){
+    document.getElementById('navLinks').classList.remove('open');
+    document.getElementById('mobileToggle').textContent='☰';
+  }
+});
+
+// ===== Animated chip tabs (services filter) =====
+(function(){
+  const wrap=document.getElementById('chipTabs');
+  if(!wrap) return;
+  const pill=document.getElementById('chipPill');
+  const chips=[...wrap.querySelectorAll('.chip')];
+  const cards=[...document.querySelectorAll('#cardsGrid .card')];
+
+  function movePill(chip){
+    pill.style.left=chip.offsetLeft+'px';
+    pill.style.width=chip.offsetWidth+'px';
+  }
+  function filter(cat){
+    cards.forEach(c=>{
+      c.classList.toggle('hide', cat!=='semua' && c.dataset.cat!==cat);
+    });
+  }
+  chips.forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      chips.forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      movePill(chip);
+      filter(chip.dataset.cat);
+    });
+  });
+  window.addEventListener('resize',()=>movePill(wrap.querySelector('.chip.active')));
+  movePill(wrap.querySelector('.chip.active'));
+})();
+
+async function submitContact(e){
+ e.preventDefault();
+ const btn=e.target.querySelector('button[type="submit"]');
+ btn.disabled=true;
+ try{
+   await api('/contact',{method:'POST',body:JSON.stringify({
+     name:document.getElementById('name').value.trim(),
+     email:document.getElementById('email').value.trim(),
+     need:document.getElementById('need').value,
+     message:document.getElementById('message').value.trim()
+   })});
+   alert('Terima kasih. Brief kamu sudah diterima.');
+   e.target.reset();
+ }catch(err){ alert(err.message); }
+ finally{ btn.disabled=false; }
+}
+</script>
+
+
+
+<script>
+const REVIEW_CONFIG={enabled:true,maxReviews:30,defaultRole:'Klien'};
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function initials(n){return n.split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
+async function getClientReviews(){try{const r=await api('/reviews');return r.reviews||[]}catch{return[]}}
+function updateReviewSummary(r){
+ const b=document.getElementById('reviewSummary');if(!b)return;
+ if(!r.length){b.innerHTML='<strong>Belum ada rating</strong><span>Jadilah yang pertama memberikan review.</span>';return}
+ const a=r.reduce((s,x)=>s+Number(x.rating),0)/r.length;
+ b.innerHTML=`<strong>${a.toFixed(1)} / 5 <span class="summary-stars">★</span></strong><span>${r.length} rating dari klien</span>`
+}
+async function renderAllTestimonials(){
+ const r=await getClientReviews();
+ const staticCards=[...document.querySelectorAll('.testi-card')].filter(x=>!x.classList.contains('client-review-card'));
+ const g=document.getElementById('testiGrid');
+ if(!g)return;
+ document.querySelectorAll('.client-review-card').forEach(x=>x.remove());
+ r.slice(0,REVIEW_CONFIG.maxReviews).reverse().forEach(x=>{
+  const c=document.createElement('article');
+  c.className='testi-card reveal client-review-card show';
+  c.innerHTML=`<div class="testi-stars">${'★'.repeat(x.rating)}${'☆'.repeat(5-x.rating)}</div><p class="testi-text">"${esc(x.text)}"</p><div class="testi-who"><div class="testi-avatar">${esc(x.initials)}</div><div><strong>${esc(x.name)}</strong><span>${esc(x.role||'Klien')}</span></div></div>`;
+  g.appendChild(c);
+ });
+ updateReviewSummary(r);
+}
+function createReviewForm(){
+ if(!REVIEW_CONFIG.enabled||document.getElementById('clientReviewBox'))return;
+ const stage=document.querySelector('.testi-3d-stage');if(!stage)return;
+ const b=document.createElement('div');b.id='clientReviewBox';b.className='client-review-box';
+ b.innerHTML=`<div class="review-heading"><div><small>SHARE YOUR EXPERIENCE</small><h3>Bagaimana pengalaman konsultasimu?</h3><p>Berikan rating dan ceritakan pengalamanmu bersama WRBN.</p></div><div id="reviewSummary" class="review-summary"></div></div><form id="clientReviewForm" class="client-review-form"><div class="review-field"><label>Rating</label><div class="rating-input" role="radiogroup" aria-label="Pilih rating">${[1,2,3,4,5].map(n=>`<button type="button" class="rating-star" data-rating="${n}" aria-label="${n} bintang">★</button>`).join('')}</div><input type="hidden" id="clientReviewRating" required></div><div class="review-two-col"><div class="review-field"><label for="clientReviewName">Nama</label><input id="clientReviewName" type="text" maxlength="60" placeholder="Nama kamu" required></div><div class="review-field"><label for="clientReviewRole">Status / Profesi</label><input id="clientReviewRole" type="text" maxlength="60" placeholder="Mahasiswa, Peneliti, UMKM..." value="${REVIEW_CONFIG.defaultRole}"></div></div><div class="review-field"><label for="clientReviewText">Testimoni</label><textarea id="clientReviewText" rows="4" maxlength="400" placeholder="Ceritakan pengalaman konsultasimu..." required></textarea></div><button class="btn primary" type="submit">Kirim Rating</button><p id="reviewMessage" class="review-message"></p></form>`;
+ stage.parentNode.insertBefore(b,stage.nextSibling);
+ const s=[...b.querySelectorAll('.rating-star')],ri=b.querySelector('#clientReviewRating');
+ s.forEach(st=>{
+  st.addEventListener('mouseenter',()=>{const v=+st.dataset.rating;s.forEach(x=>x.classList.toggle('hovered',+x.dataset.rating<=v))});
+  st.addEventListener('mouseleave',()=>{const v=+(ri.value||0);s.forEach(x=>x.classList.toggle('selected',+x.dataset.rating<=v));s.forEach(x=>x.classList.remove('hovered'))});
+  st.addEventListener('click',()=>{const v=+st.dataset.rating;ri.value=v;s.forEach(x=>x.classList.toggle('selected',+x.dataset.rating<=v));b.querySelector('#reviewMessage').textContent=`${v}/5 dipilih`})
+ });
+ b.querySelector('#clientReviewForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const rating=+ri.value,name=b.querySelector('#clientReviewName').value.trim(),role=b.querySelector('#clientReviewRole').value.trim()||REVIEW_CONFIG.defaultRole,text=b.querySelector('#clientReviewText').value.trim(),m=b.querySelector('#reviewMessage');
+  if(!rating){m.textContent='Pilih rating terlebih dahulu.';return}
+  if(!name||!text){m.textContent='Nama dan testimoni wajib diisi.';return}
+  if(!currentUser){
+   m.textContent='Login terlebih dahulu untuk mengirim rating.';
+   window.__afterAuth=()=>{};
+   return openAuth('login');
+  }
+  const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;m.textContent='Mengirim...';
+  try{
+   await api('/reviews',{method:'POST',body:JSON.stringify({rating,name,role,text})});
+   e.target.reset();ri.value='';s.forEach(x=>x.classList.remove('selected','hovered'));m.textContent='Terima kasih! Rating kamu sudah dikirim.';
+   await renderAllTestimonials();
+  }catch(err){m.textContent=err.message}
+  finally{btn.disabled=false}
+ });
+}
+document.addEventListener('DOMContentLoaded',()=>{createReviewForm();renderAllTestimonials()});
+</script>
+<script src="/velaris.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WRBN — Kelola Akun</title>
+<style>
+:root{--bg:#07100d;--panel:#0c1713;--line:rgba(150,255,196,.13);--text:#effff5;--muted:#8fa69a;--green:#79e6a5;--danger:#ff7f91}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,rgba(78,220,137,.13),transparent 32%),radial-gradient(circle at 90% 20%,rgba(22,151,98,.11),transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;padding:32px 18px}
+.wrap{width:min(980px,100%);margin:auto}.top{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:22px}.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--green);font-weight:700}.title{font-size:clamp(28px,5vw,42px);margin:5px 0 6px;letter-spacing:-.03em}.sub{margin:0;color:var(--muted)}
+.panel{background:rgba(12,23,19,.82);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.28);backdrop-filter:blur(14px)}
+.auth{display:grid;gap:10px;max-width:520px}.row{display:flex;gap:10px;align-items:center}.input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:#09130f;color:var(--text);outline:none}.input:focus{border-color:rgba(121,230,165,.45);box-shadow:0 0 0 3px rgba(121,230,165,.07)}button{border:0;border-radius:12px;padding:12px 16px;font-weight:750;cursor:pointer;transition:.2s ease}.primary{background:var(--green);color:#062111}.danger{background:rgba(255,127,145,.12);color:#ff9dad;border:1px solid rgba(255,127,145,.22)}button:hover{transform:translateY(-1px);filter:brightness(1.04)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.msg{font-size:13px;color:var(--muted);min-height:18px}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap}.count{color:var(--muted);font-size:14px}.selectall{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}input[type=checkbox]{width:18px;height:18px;accent-color:#79e6a5}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px}.table{width:100%;border-collapse:collapse;min-width:650px}.table th,.table td{text-align:left;padding:14px 12px;border-bottom:1px solid rgba(150,255,196,.08)}.table th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9ab2a5}.table td{font-size:14px}.table tr:last-child td{border-bottom:0}.email{font-weight:650}.meta{color:var(--muted);font-size:12px;margin-top:3px}.empty{text-align:center;padding:40px;color:var(--muted)}.hidden{display:none!important}.danger-zone{display:flex;gap:10px;align-items:center;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}.warning{color:#dca6ad;font-size:12px;margin-right:auto}.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;padding:18px;backdrop-filter:blur(7px)}.modal.open{display:grid}.modal-box{width:min(480px,100%);background:#0d1814;border:1px solid var(--line);border-radius:20px;padding:22px;animation:in .25s ease}.modal-box h2{margin:0 0 8px}.modal-box p{color:var(--muted);line-height:1.55}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}@keyframes in{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+</style>
+<script src="/config.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div><div class="eyebrow">WRBN ADMIN</div><h1 class="title">Kelola Akun</h1><p class="sub">Lihat email yang terdaftar, centang akun, lalu hapus.</p></div></div>
+
+  <section id="loginPanel" class="panel auth">
+    <strong>Masuk ke pengelolaan akun</strong>
+    <input id="adminEmail" class="input" type="email" placeholder="Email admin">
+    <input id="adminPassword" class="input" type="password" placeholder="Password admin">
+    <button id="loginBtn" class="primary">Masuk</button>
+    <div id="loginMsg" class="msg"></div>
+  </section>
+
+  <section id="usersPanel" class="panel hidden">
+    <div class="toolbar">
+      <label class="selectall"><input id="selectAll" type="checkbox"> Pilih semua</label>
+      <div id="count" class="count"></div>
+    </div>
+    <div id="tableWrap" class="table-wrap"></div>
+    <div class="danger-zone">
+      <div class="warning">Menghapus akun juga menghapus project, pembayaran, dan file milik akun tersebut.</div>
+      <button id="deleteBtn" class="danger" disabled>Hapus yang dipilih</button>
+    </div>
+    <div id="listMsg" class="msg" style="margin-top:10px"></div>
+  </section>
+</div>
+
+<div id="confirmModal" class="modal"><div class="modal-box"><h2>Hapus akun?</h2><p id="confirmText"></p><div class="modal-actions"><button id="cancelDelete">Batal</button><button id="confirmDelete" class="danger">Ya, hapus</button></div></div></div>
+<script>
+const $=id=>document.getElementById(id);let selected=new Set();
+const API_BASE=(window.WRBN_CONFIG?.API_BASE_URL||'')+'/api';
+async function api(path,opt={}){const r=await fetch(API_BASE+'/admin'+path,{credentials:'include',...opt,headers:{...(opt.headers||{}),'Content-Type':'application/json'}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.message||'Request gagal.');return d}
+function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
+async function load(){const d=await api('/users');selected=new Set();$('selectAll').checked=false;$('deleteBtn').disabled=true;$('count').textContent=`${d.users.length} akun terdaftar`;if(!d.users.length){$('tableWrap').innerHTML='<div class="empty">Belum ada akun terdaftar.</div>';return}$('tableWrap').innerHTML=`<table class="table"><thead><tr><th style="width:55px"></th><th>Nama</th><th>Email</th><th>Project</th><th>Terdaftar</th></tr></thead><tbody>${d.users.map(u=>`<tr><td><input class="user-check" type="checkbox" value="${esc(u.id)}"></td><td><strong>${esc(u.name)}</strong><div class="meta">${esc(u.whatsapp||'WhatsApp belum diisi')}</div></td><td><div class="email">${esc(u.email)}</div></td><td>${u.consultation_count}</td><td>${new Date(u.created_at).toLocaleString('id-ID')}</td></tr>`).join('')}</tbody></table>`;document.querySelectorAll('.user-check').forEach(c=>c.onchange=()=>{c.checked?selected.add(c.value):selected.delete(c.value);updateDelete()})}
+function updateDelete(){$('deleteBtn').disabled=!selected.size;$('count').textContent=`${selected.size} dipilih`}
+$('loginBtn').onclick=async()=>{$('loginMsg').textContent='Memeriksa...';try{await api('/login',{method:'POST',body:JSON.stringify({email:$('adminEmail').value.trim(),password:$('adminPassword').value})});$('loginPanel').classList.add('hidden');$('usersPanel').classList.remove('hidden');$('loginMsg').textContent='';await load()}catch(e){$('loginMsg').textContent=e.message}};
+$('adminPassword').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});$('selectAll').onchange=()=>{document.querySelectorAll('.user-check').forEach(c=>{c.checked=$('selectAll').checked;if(c.checked)selected.add(c.value);else selected.delete(c.value)});updateDelete()};
+$('deleteBtn').onclick=()=>{const n=selected.size;$('confirmText').textContent=`Kamu akan menghapus ${n} akun beserta seluruh data project dan file yang terkait. Tindakan ini tidak bisa dibatalkan.`;$('confirmModal').classList.add('open')};$('cancelDelete').onclick=()=>$('confirmModal').classList.remove('open');$('confirmDelete').onclick=async()=>{try{$('confirmDelete').disabled=true;const d=await api('/users',{method:'DELETE',body:JSON.stringify({ids:[...selected]})});$('confirmModal').classList.remove('open');$('listMsg').textContent=d.message;await load()}catch(e){$('listMsg').textContent=e.message;$('confirmModal').classList.remove('open')}finally{$('confirmDelete').disabled=false}};
+api('/session').then(()=>{ $('loginPanel').classList.add('hidden'); $('usersPanel').classList.remove('hidden'); load(); }).catch(()=>{});
+</script>
+</body></html>
