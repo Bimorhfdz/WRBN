@@ -39,3 +39,6 @@ legacy-node/backend/uploads/*
 backup/
 certs/*.key
 .env.vercel
+
+.vercel
+.env.local
