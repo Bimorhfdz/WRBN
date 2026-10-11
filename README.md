@@ -78,17 +78,45 @@ curl -o certs/ca.pem https://<host-aiven>/ca.pem
 Folder `certs/` di-kecualikan dari `.gitignore` untuk file `.key`, tetapi
 `ca.pem` boleh di-commit karena bukan rahasia.
 
-### 3. Buat database kosong
+### 3. Catat nama database
+
+Aiven membuat `defaultdb` secara otomatis, dan itu sudah cukup — tidak perlu
+buat database baru. Catat nilainya dari halaman service:
+
+| Field | Nilai |
+| --- | --- |
+| Host | `mysql-<....>.aivencloud.com` |
+| Port | `11992` (atau sesuai dashboard) |
+| Database name | `defaultdb` |
+| User | `avnadmin` |
+| SSL mode | `REQUIRED` |
+
+> Kalau tetap ingin database terpisah, buat dulu lewat mysql client, dan
+> pastikan `DB_DATABASE` di `.env.aiven` menunjuk ke sana.
+
+### 4. Tes menembak Aiven dari laptop
+
+Sebelum deploy, pastikan laptop kamu bisa bicara dengan Aiven. Isi
+`.env.aiven` (sudah ada templatnya, dan sudah masuk `.gitignore`), lalu:
 
 ```
-mysql -h <host-aiven> -P <port> -u <user> -p
+php artisan migrate:status --env=aiven
+php artisan migrate --env=aiven
 ```
 
-```
-CREATE DATABASE wrbn CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
+> `--env=aiven` membuat Laravel membaca `.env.aiven` alih-alih `.env`.
+> Ini opsi artisan, bukan PHP — jangan ditulis `php --env-file=...`.
+> Perintahnya juga tidak memodifikasi `.env` lokal sama sekali.
 
-### 4. Isi environment variables di Vercel
+Kalau perintah itu sukses, deploy hampir pasti aman. Kalau gagal, dua
+penyebab paling umum:
+
+| Pesan | Penyebab | Solusi |
+| --- | --- | --- |
+| `SQLSTATE[HY000] [2002] ...` atau timeout | TLS belum aktif | isi `MYSQL_ATTR_SSL_CA` dengan path absolut ke `certs/ca.pem` |
+| `Unknown database` | nama database belum dibuat | buat dulu di dashboard Aiven |
+
+### 5. Isi environment variables di Vercel
 
 Buka dashboard Vercel → project → **Settings → Environment Variables**.
 Ambil seluruh isi `.env.production.example` sebagai cetak biru, lalu isi
@@ -106,7 +134,7 @@ nilainya sendiri. Yang wajib diperhatikan:
 | `APP_CONFIG_CACHE` dst. | `/tmp/...` | hanya `/tmp` yang bisa ditulis |
 | `VIEW_COMPILED_PATH` | `/tmp/views` | sama |
 
-### 5. Deploy
+### 6. Deploy
 
 ```
 npm i -g vercel
@@ -117,13 +145,33 @@ vercel --prod
 Atau hubungkan repository GitHub: Vercel akan deploy otomatis setiap push ke
 `main`.
 
-### 6. Import data lama (sekali saja)
+### 7. Isi data awal (sekali saja)
 
-Dump ada di `backup/wrbn-<tanggal>.sql`. Import dari laptop:
+Production diisi lewat seeder, bukan dump — supaya tidak ikut data uji
+(165 sessions, 16 akun percobaan) yang ada di lokal.
 
 ```
-mysql -h <host-aiven> -P <port> -u <user> -p wrbn < backup/wrbn-20261011-012111.sql
+php artisan db:seed --env=aiven
 ```
+
+Membuat 3 paket (Basic/VIP/Custom) + contact person. Lalu buat akun admin
+dari `ADMIN_EMAIL` / `ADMIN_PASSWORD` di `.env.aiven`:
+
+```
+php artisan wrbn:create-admin --env=aiven
+```
+
+Whitelist member (`member_emails`) bisa diisi lewat panel **Members** di
+`/admin` setelah deploy.
+
+> **Alternatif:** kalau mau mempertahankan data yang ada di lokal, import
+> dump-nya dulu, lalu jalankan ulang `php artisan migrate --env=aiven`
+> karena dump diambil sebelum migration kolom `contents`:
+>
+> ```
+> mysql -h <host-aiven> -P <port> -u <user> -p <db> < backup/wrbn-<tanggal>.sql
+> php artisan migrate --env=aiven
+> ```
 
 ## Catatan deploy
 
