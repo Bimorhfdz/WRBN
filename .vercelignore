@@ -6,13 +6,18 @@
 .env.*
 !.env.example
 /bootstrap/cache/*.php
-/storage
+
+# Keep the storage skeleton (its .gitignore placeholders) so the directory
+# structure exists at runtime; only the runtime junk is left behind.
+/storage/*
+!/storage/**/.gitignore
 /node_modules
 /public/build
 
-# Dumps and certificates are only used from a laptop.
+# Dumps are only used from a laptop. The CA certificate MUST be uploaded:
+# MYSQL_ATTR_SSL_CA=certs/ca.pem points at it at runtime.
 /backup
-/certs
+certs/*.key
 /database/*.sqlite
 
 # Development-only folders.

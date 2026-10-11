@@ -38,3 +38,4 @@ legacy-node/backend/uploads/*
 .env.aiven
 backup/
 certs/*.key
+.env.vercel
